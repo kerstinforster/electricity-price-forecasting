@@ -7,7 +7,7 @@
 This is the project repository of group 3 for the course Applied Machine Intelligence at TUM.  
 Group Members:
 - Adrian Michl (MTK: )
-- Anna Mrosik (MTK: )
+- Anna Mrosik (MTK: 03695133)
 - Farouk Ferjani (MTK: )
 - Florian Mysliwetz (MTK: )
 - Jakob Kruse (MTK: 03682020)
