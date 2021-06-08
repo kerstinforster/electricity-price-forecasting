@@ -1,5 +1,6 @@
 # Project specific
 html_coverage
+data
 
 # Pycharm
 .idea
