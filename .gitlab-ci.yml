@@ -28,6 +28,8 @@ test:
     - source venv/bin/activate
     - pip install -r requirements.txt
     - python -m pytest
+  tag: 
+    - daedalus
 
 lint:
   stage: lint
@@ -41,3 +43,5 @@ lint:
     - source venv/bin/activate
     - pip install pylint
     - pylint src test
+  tag: 
+    - daedalus
