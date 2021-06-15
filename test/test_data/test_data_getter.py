@@ -1,17 +1,21 @@
 """ Tests that validate the data getter methods """
 import os
+from typing import Any
 
 import pytest
 
-from src.data.data_getter import *
+from src.data.data_getter import BaseDataGetter
 
 
-class DataGetterTest(DataGetter):
+class DataGetterTest(BaseDataGetter):
+    def _get_raw_data(self) -> Any:
+        pass
+
+    def _process_raw_data(self, data: Any) -> Any:
+        pass
+
     def __init__(self):
         super().__init__("test")
-
-    def get_data(self) -> None:
-        pass
 
 
 def test_init():
@@ -34,13 +38,3 @@ def test_init():
     # Test if path already exists
     dg = DataGetterTest()
     os.removedirs(os.path.join(path, 'data', 'test'))
-
-
-def test_get_data_uses_derived():
-    dg = DataGetterTest()
-    # Base class would throw error
-    dg.get_data()
-    path = dg.get_project_root()
-    os.removedirs(os.path.join(path, 'data', 'test'))
-    with pytest.raises(TypeError):
-        _ = DataGetter("base")

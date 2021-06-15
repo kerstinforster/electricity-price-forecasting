@@ -2,31 +2,27 @@
 stock market price data"""
 
 import requests
-import os
 import json
-import pandas as pd
 from typing import Any
+from datetime import datetime, timedelta
+import numpy as np
+import pandas as pd
 
-from src.data.data_getter import DataGetter
+from src.data.data_getter import BaseDataGetter
 
 
-class MontelDataGetter(DataGetter):
+class MontelDataGetter(BaseDataGetter):
     """
-    This class is responsible for downloading the Montel dataset(s)
+    This class is responsible for downloading the Montel EPEX Spot data.
+    This data contains electricity spot market prices in an hourly interval.
+    The values are given in the unit EURO/MWh.
     """
     def __init__(self, name: str = 'montel'):
         """
         Constructor for the Montel Data Getter
         """
         super().__init__(name)
-        self.token = 'Zeo4XP4SswsOwnradSkZQ6Xh16eEi10UNtTE1Q3ek4lS2Xv0Nx40RKs' \
-                     'KqxryzUCwAV6fzmt2erLFigT9iNy_IYcq85A7jO-kE7mRun8Dpk6BH6' \
-                     'xc0mMVzzyog8ZnK3Jk3X_8drbMbGqMUeFGc7ul06CERBN_QZ4ySQdOR' \
-                     '1EAYOLzVyHkae7d3KBdxLazP3QvYohPhIYGScKmNipVkhOpTdQwROce' \
-                     'ZS54CGCw8QSWm8wv5vnCNXYxAl7fxd4nEZEaZhHqOgKMnw2MgjtHYJ2' \
-                     'jkhfnsOQcbP52zp-6wI6-YyXWoiOphouS7w10Le0kacBQfDXVzMjoGS' \
-                     'FIdPCRxB4qTrXT6n14OO2VwdrXVO4wxbYN65fUYWntRE02d820pw4fE' \
-                     'rykZaUcQFCTEqWC9XHU_FWlSC2yZAGNrMFBrh5EiZ4'
+        self.token = 'VHwQF502L7rCkl-URyn0BvqzkFPZ_V9ovU5MOXYsDaUYbjVBGz37jJUx7Kgj01BEOxU6w3b8c6uxUWCEpXvQSZR_hKvL5ObPKNKAaV7a_iWmLPaa8aQmm9Whu2pK0sfa-e5pb_4R8XlMN8GAl8kci8nFWyR9bN2nBNR459ogXsHgoINsi142fQBHXWj7TVx7kKKFYuAwNiNNwXJfz-2q2DcNATrx6cco_QXkj2az7Tz0mBVaM-cWyN8ykWphitzWjrqEbhUEi73Mob1jNkrhfOTlqvErctozYeYvBFK7MON6Hc6paPPqr0FVByeFuU9kkUT-sT_DgIlbBpZWHqiu8rPeYgsC-sMxPpTAusKAhGjYa7oo4WvSH-5OLGnY3X0rzKP0ojFAasOhwFo7570oswt-AgtdISOf2c7LkTRDaJw'  # pylint: disable=C0301
         self._token_check()
 
     def _token_check(self) -> None:
@@ -57,8 +53,7 @@ class MontelDataGetter(DataGetter):
             # 'Country', 'DefaultCurrency', 'AvailableCurrencies'
             print(result)
 
-    def _get_raw_data(self, start_date: str = '2012-01-01',
-                  end_date: str = '2021-06-01') -> Any:
+    def _get_raw_data(self) -> Any:
         """
         This function downloads the datasets that shall be used for training.
         :return: json data from the API
@@ -66,8 +61,8 @@ class MontelDataGetter(DataGetter):
         params = {
             'spotKey': 14,  # This is the key we should use
             'fields': ['Base', 'Peak', 'Hours'],
-            'fromDate': start_date,  # yyyy-mm-dd
-            'toDate': end_date,  # yyyy-mm-dd
+            'fromDate': self.start_date,  # yyyy-mm-dd
+            'toDate': self.end_date,  # yyyy-mm-dd
             'currency': 'eur',
             'sortType': 'ascending'
         }
@@ -78,43 +73,78 @@ class MontelDataGetter(DataGetter):
         )
         return response.json()
 
-    @staticmethod
-    def _process_raw_data(data: Any) -> Any:
+    def _process_raw_data(self, data: Any) -> Any:
         """
         Data preprocessing method that transforms the json response into more
         useful and quicker-to-access data
         :param data: The raw json data from the API
         :return: list of dicts that is suitable for pandas
         """
+        processed_data = []
         data_el = data['Elements']
         for element in data_el:
             element['Date'] = element['Date'][:10]
 
             # For the changes from summer to winter time we don't have 24 hours
+            # For simplicity let us just always have 24 hours
             if len(element['TimeSpans']) == 23:
                 element['TimeSpans'].append(element['TimeSpans'][-1])
             elif len(element['TimeSpans']) == 25:
                 element['TimeSpans'] = element['TimeSpans'][:24]
+            elif len(element['TimeSpans']) != 24:
+                raise ValueError(f'Element {element["Date"]} has '
+                                 f'{len(element["TimeSpans"])} hours.')
 
             for index, value in enumerate(element['TimeSpans']):
-                element[f't{index}'] = value['Value']
-            del element['TimeSpans']
-        return data_el
+                data_point = dict()
+                data_point['Time'] = \
+                    f'{element["Date"]}T{index:02d}'
+                data_point['Value'] = value['Value']
+                processed_data.append(data_point)
 
-    def get_data(self, start_date: str = '2012-01-01',
-                 end_date: str = '2021-06-01') -> None:
+        # Quick sanity check here
+        if not self.check_data(processed_data):
+            processed_data = self.repair_data(processed_data)
+
+        return processed_data
+
+    def check_data(self, data: list) -> bool:
         """
-        Main method that gets the montel EEX data and stores it in a csv file
-        :param start_date: Start date for the data to get in format yyyy-mm-dd
-        :param end_date: End date for the data to get in format yyyy-mm-dd
+        Checks if the data was downloaded correctly.
+        :param data: The downloaded data
+        :return: bool True if download was successful, False otherwise
         """
-        data = self._get_raw_data(start_date, end_date)
-        print(f'Received {data["SpotName"]} spot data.')
-        processed_data = self._process_raw_data(data)
-        df = pd.DataFrame(data=processed_data)
-        df.to_csv(os.path.join(self.data_dir, 'data.csv'), index=False)
+        assert isinstance(data, list)
+        assert isinstance(data[0], dict)
+        return len(data) == self._get_num_days() * 24
+
+    def repair_data(self, data: list) -> list:
+        """
+        There was an issue where one date did not have data in the upstream
+        dataset provided by montel.
+        This function fixes this problem by copying the data from the previous
+        day to ensure a data series without missing entries.
+        :param data: The data with missing entries as list of dicts
+        :return: The original list of dicts with added missing entries
+        """
+        df = pd.DataFrame(data=data)
+        all_times = np.unique(list(df.Time))
+        missing_dates = []
+        for i in range(self._get_num_days()):
+            for h in range(24):
+                time_str = (datetime.strptime(self.start_date, '%Y-%m-%d') +
+                            timedelta(days=i, hours=h)).strftime('%Y-%m-%dT%H')
+                if not time_str in all_times:
+                    missing_dates.append(time_str[:10])
+                    start_index = i * 24 + h
+                    data.insert(start_index, data[start_index - 24])
+                    data[start_index]['Time'] = time_str
+        print(f'Repaired missing montel data from dates: '
+              f'{np.unique(missing_dates)}')
+        assert self.check_data(data)
+        return data
 
 
 if __name__ == '__main__':
     dg = MontelDataGetter()
-    dg.get_data()
+    dg.get_data(overwrite=False)
