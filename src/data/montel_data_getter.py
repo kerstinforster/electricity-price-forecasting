@@ -19,14 +19,7 @@ class MontelDataGetter(DataGetter):
         Constructor for the Montel Data Getter
         """
         super().__init__(name)
-        self.token = 'Zeo4XP4SswsOwnradSkZQ6Xh16eEi10UNtTE1Q3ek4lS2Xv0Nx40RKs' \
-                     'KqxryzUCwAV6fzmt2erLFigT9iNy_IYcq85A7jO-kE7mRun8Dpk6BH6' \
-                     'xc0mMVzzyog8ZnK3Jk3X_8drbMbGqMUeFGc7ul06CERBN_QZ4ySQdOR' \
-                     '1EAYOLzVyHkae7d3KBdxLazP3QvYohPhIYGScKmNipVkhOpTdQwROce' \
-                     'ZS54CGCw8QSWm8wv5vnCNXYxAl7fxd4nEZEaZhHqOgKMnw2MgjtHYJ2' \
-                     'jkhfnsOQcbP52zp-6wI6-YyXWoiOphouS7w10Le0kacBQfDXVzMjoGS' \
-                     'FIdPCRxB4qTrXT6n14OO2VwdrXVO4wxbYN65fUYWntRE02d820pw4fE' \
-                     'rykZaUcQFCTEqWC9XHU_FWlSC2yZAGNrMFBrh5EiZ4'
+        self.token = 'VHwQF502L7rCkl-URyn0BvqzkFPZ_V9ovU5MOXYsDaUYbjVBGz37jJUx7Kgj01BEOxU6w3b8c6uxUWCEpXvQSZR_hKvL5ObPKNKAaV7a_iWmLPaa8aQmm9Whu2pK0sfa-e5pb_4R8XlMN8GAl8kci8nFWyR9bN2nBNR459ogXsHgoINsi142fQBHXWj7TVx7kKKFYuAwNiNNwXJfz-2q2DcNATrx6cco_QXkj2az7Tz0mBVaM-cWyN8ykWphitzWjrqEbhUEi73Mob1jNkrhfOTlqvErctozYeYvBFK7MON6Hc6paPPqr0FVByeFuU9kkUT-sT_DgIlbBpZWHqiu8rPeYgsC-sMxPpTAusKAhGjYa7oo4WvSH-5OLGnY3X0rzKP0ojFAasOhwFo7570oswt-AgtdISOf2c7LkTRDaJw'  # pylint: disable=C0301
         self._token_check()
 
     def _token_check(self) -> None:
