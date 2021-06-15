@@ -1,6 +1,7 @@
 # Project specific
 html_coverage
-data
+data/
+!src/data
 
 # Pycharm
 .idea

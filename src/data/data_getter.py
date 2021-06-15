@@ -29,15 +29,15 @@ class BaseDataGetter(ABC):
                  end_date: str = '2021-06-01', overwrite: bool = False) \
             -> pd.DataFrame:
         """
-        This is the entry point before any program. This is the only function
-        that should be called fro the outside.
+        This is the entry point for any program. This is the only function
+        that should be called from the outside.
         This function is responsible for getting all the required data between
         the start and end date. Checks if the data is already downloaded and
         loads all the data in a dataframe
         :param start_date: Start date to get the data from
         :param end_date: End date to get the data for (included in data)
         :param overwrite: Bool flag to force downloading the data
-        :return:
+        :return: pd.DataFrame containing the data and timestamps
         """
         self.start_date = start_date
         self.end_date = end_date
@@ -54,8 +54,7 @@ class BaseDataGetter(ABC):
         exactly 24 hours - Drop or add values if necessary.
 
         The data is then stored in a csv file in the form:
-        date (string) | hour (string) | value | more values (optional)
-        :return: bool True if successful, otherwise False
+        | timestamp (day + hour) | value1 | valueN (optional) |
         """
         print(f'Downloading {self.name} data.')
         data = self._get_raw_data()
@@ -68,9 +67,8 @@ class BaseDataGetter(ABC):
         """
         Load the required data from the csv file in the data dir.
         Then, filter only the required dates between start and end date
-        The data should in the end look like:
-        date (string) | hour (string) | value | more values (optional)
-
+        The data fields need to look like:
+        | Time (day + hour) | value1 | valueN (optional) |
         :return: Dataframe containing the data between the start and end dates
         """
         all_data = pd.read_csv(os.path.join(self.data_dir, 'data.csv'))
