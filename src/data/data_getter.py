@@ -41,8 +41,8 @@ class BaseDataGetter(ABC):
         """
         self.start_date = start_date
         self.end_date = end_date
-        if not os.path.exists(os.path.join(self.data_dir, 'data.csv')) \
-                or overwrite:
+        if overwrite or \
+                not os.path.exists(os.path.join(self.data_dir, 'data.csv')):
             self.download_data()
         return self.load_data()
 

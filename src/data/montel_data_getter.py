@@ -147,4 +147,4 @@ class MontelDataGetter(BaseDataGetter):
 
 if __name__ == '__main__':
     dg = MontelDataGetter()
-    dg.get_data(overwrite=False)
+    dg.get_data()
