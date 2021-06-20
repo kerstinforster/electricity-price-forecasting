@@ -16,6 +16,7 @@ class MontelDataGetter(BaseDataGetter):
     This class is responsible for downloading the Montel EPEX Spot data.
     This data contains electricity spot market prices in an hourly interval.
     The values are given in the unit EURO/MWh.
+    Earliest date is: '2000-06-16'
     """
     def __init__(self, name: str = 'montel'):
         """
@@ -141,6 +142,9 @@ class MontelDataGetter(BaseDataGetter):
                     data[start_index]['Time'] = time_str
         print(f'Repaired missing montel data from dates: '
               f'{np.unique(missing_dates)}')
+        if self.start_date in missing_dates:
+            raise RuntimeError('The start date you picked is too soon! '
+                               'No data available for montel API.')
         assert self.check_data(data)
         return data
 
