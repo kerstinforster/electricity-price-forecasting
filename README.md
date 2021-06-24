@@ -11,9 +11,9 @@ Group Members:
 - Farouk Ferjani (MTK: 03666175)
 - Florian Mysliwetz (MTK: 03671374)
 - Jakob Kruse (MTK: 03682020)
-- Kerstin Forster (MTK: )
+- Kerstin Forster (MTK: 03696804)
 - Oliver Hehmann (MTK: )
-- Philip Durst (MTK: )
+- Philip Durst (MTK: 03684092)
 
 ## Setup
 1. Install the required packages:
