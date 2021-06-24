@@ -69,8 +69,8 @@ def test_check_data():
     processed_data = dg._process_raw_data(raw_data)
     assert len(processed_data) == 24 * 31
     for i in range(24):
-        assert processed_data[72 + i]['Value'] == \
-            processed_data[48 + i]['Value']
+        assert processed_data[72 + i]['SPOTPrice'] == \
+            processed_data[48 + i]['SPOTPrice']
 
 
 def test_loading():
@@ -83,11 +83,19 @@ def test_loading():
 
     assert os.path.exists(os.path.join(dg.data_dir, 'data.csv'))
 
-    data_3 = dg.get_data('2020-01-10', '2020-12-31')
-    assert data1.iloc[9*24:, :].equals(data_3)
+    data3 = dg.get_data('2020-01-10', '2020-12-31')
+    assert data1.iloc[9*24:, :].reset_index(drop=True).equals(data3)
 
     # Get older data than is downloaded
     data_4 = dg.get_data('2019-01-01', '2020-12-31')
 
     os.remove(os.path.join(dg.data_dir, 'data.csv'))
     os.removedirs(dg.data_dir)
+
+
+def test_loading_latest():
+    dg = MontelDataGetter("montel_test")
+    data = dg.get_data('2020-01-01', 'latest')
+    data2 = dg.get_data('2020-01-01', '2020-06-01', 'T04')
+    assert np.mod(len(data2.index), 24) == 5
+    assert data.iloc[:len(data2.index), :].equals(data2)

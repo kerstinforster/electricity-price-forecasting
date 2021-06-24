@@ -4,6 +4,7 @@ from typing import Any
 from abc import ABC, abstractmethod
 from pathlib import Path
 import os
+import numpy as np
 from datetime import datetime
 import pandas as pd
 
@@ -24,10 +25,11 @@ class BaseDataGetter(ABC):
             os.makedirs(self.data_dir)
         self.start_date = '2012-01-01'
         self.end_date = '2021-06-01'
+        self.end_time = 'T23'
 
     def get_data(self, start_date: str = '2012-01-01',
-                 end_date: str = '2021-06-01', overwrite: bool = False) \
-            -> pd.DataFrame:
+                 end_date: str = '2021-06-01', end_time: str = 'T23',
+                 overwrite: bool = False) -> pd.DataFrame:
         """
         This is the entry point for any program. This is the only function
         that should be called from the outside.
@@ -35,13 +37,16 @@ class BaseDataGetter(ABC):
         the start and end date. Checks if the data is already downloaded and
         loads all the data in a dataframe
         :param start_date: Start date to get the data from
-        :param end_date: End date to get the data for (included in data)
+        :param end_date: End date to get the data for (included in data) or
+        'latest' (get as new data as possible)
+        :param end_time: End time in format 'T00' until 'T23'
         :param overwrite: Bool flag to force downloading the data
         :return: pd.DataFrame containing the data and timestamps
         """
         self.start_date = start_date
         self.end_date = end_date
-        if overwrite or \
+        self.end_time = end_time
+        if overwrite or end_date == 'latest' or\
                 not os.path.exists(os.path.join(self.data_dir, 'data.csv')):
             self.download_data()
         return self.load_data()
@@ -75,15 +80,17 @@ class BaseDataGetter(ABC):
         all_data['Time'] = pd.to_datetime(all_data['Time'])
         # Get slice indices
         start = pd.to_datetime(self.start_date + 'T00')
-        end = pd.to_datetime(self.end_date + 'T23')
         start_index = all_data.index[all_data['Time'] == start]
-        end_index = all_data.index[all_data['Time'] == end]
+        end_index = np.array([None]) if self.end_date == 'latest' else \
+            all_data.index[all_data['Time'] ==
+                           pd.to_datetime(self.end_date + self.end_time)] + 1
         if not start_index.size or not end_index.size:
             # Downloaded data does not contain all the required data
             self.download_data()
             return self.load_data()
-
-        return all_data.iloc[start_index[0]:end_index[0], :]
+        data = all_data.iloc[start_index[0]:end_index[0], :]
+        data = data.reset_index(drop=True)
+        return data
 
     @staticmethod
     def get_project_root() -> Path:
@@ -130,6 +137,10 @@ class BaseDataGetter(ABC):
         :return:
         """
         start = datetime.strptime(self.start_date, '%Y-%m-%d')
-        end = datetime.strptime(self.end_date, '%Y-%m-%d')
+        if self.end_date == 'latest':
+            now = datetime.now()
+            end = datetime.strptime(now.strftime("%Y-%m-%d"), "%Y-%m-%d")
+        else:
+            end = datetime.strptime(self.end_date, '%Y-%m-%d')
         delta = end - start
         return delta.days + 1
