@@ -18,13 +18,11 @@ class WeatherDataGetter(BaseDataGetter):
         """
         Constructor for the Weather Data Getter
         """
-        # BaseDataGetter.__init__(self, name=name)
         super().__init__(name)
         geolocator = Nominatim(user_agent="weather_agent")      
         self.location = location
         self.latitude = geolocator.geocode(location).latitude
         self.longitude = geolocator.geocode(location).longitude
-
 
     def check_data_coverage(self, data):
         """
@@ -32,7 +30,6 @@ class WeatherDataGetter(BaseDataGetter):
         """
         print("Data coverage {0:.0%}".format(data.coverage()))
         pass      
-    
 
     def _get_raw_data(self):
         """
@@ -43,8 +40,9 @@ class WeatherDataGetter(BaseDataGetter):
         position = Point(self.latitude, self.longitude)
         # Get all the data point until the last hour of the last day
         end_date = self.end_date + ' ' + '23:59'
-        data = Hourly(loc=position, start=datetime.strptime(self.start_date, '%Y-%m-%d'), \
-            end=datetime.strptime(end_date, '%Y-%m-%d %H:%M'))        
+        data = Hourly(loc=position,
+                      start=datetime.strptime(self.start_date, '%Y-%m-%d'),
+                      end=datetime.strptime(end_date, '%Y-%m-%d %H:%M'))
         # Check data coverage
         self.check_data_coverage(data)
 
@@ -58,13 +56,10 @@ class WeatherDataGetter(BaseDataGetter):
         fp_data = data.fetch()
         fp_data.index.name = "Time"
         fp_data.reset_index(level=0, inplace=True)
-        
 
         return fp_data
-        
 
 
-   
 if __name__ == '__main__':    
     wg = WeatherDataGetter()
     wg.get_data()
