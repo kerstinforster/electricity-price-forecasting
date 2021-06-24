@@ -26,7 +26,7 @@ class MontelDataGetter(BaseDataGetter):
         super().__init__(name)
         self.token = 'VHwQF502L7rCkl-URyn0BvqzkFPZ_V9ovU5MOXYsDaUYbjVBGz37jJUx7Kgj01BEOxU6w3b8c6uxUWCEpXvQSZR_hKvL5ObPKNKAaV7a_iWmLPaa8aQmm9Whu2pK0sfa-e5pb_4R8XlMN8GAl8kci8nFWyR9bN2nBNR459ogXsHgoINsi142fQBHXWj7TVx7kKKFYuAwNiNNwXJfz-2q2DcNATrx6cco_QXkj2az7Tz0mBVaM-cWyN8ykWphitzWjrqEbhUEi73Mob1jNkrhfOTlqvErctozYeYvBFK7MON6Hc6paPPqr0FVByeFuU9kkUT-sT_DgIlbBpZWHqiu8rPeYgsC-sMxPpTAusKAhGjYa7oo4WvSH-5OLGnY3X0rzKP0ojFAasOhwFo7570oswt-AgtdISOf2c7LkTRDaJw'  # pylint: disable=C0301
         self._token_check()
-        self.now_date = datetime.now().strftime("%Y-%m-%d")
+        self.now_date = datetime.now().strftime('%Y-%m-%d')
 
     def _token_check(self) -> None:
         """
@@ -136,8 +136,8 @@ class MontelDataGetter(BaseDataGetter):
             return len(data) == self._get_num_days() * 24
         else:
             now = datetime.now()
-            end = datetime.strptime(now.strftime("%Y-%m-%d"), "%Y-%m-%d")
-            last_day = datetime.strptime(data[-1]['Time'][:10], "%Y-%m-%d")
+            end = datetime.strptime(now.strftime('%Y-%m-%d'), '%Y-%m-%d')
+            last_day = datetime.strptime(data[-1]['Time'][:10], '%Y-%m-%d')
             last_time = int(data[-1]['Time'][11:])
             days_missing = (end - last_day).days
             return len(data) == (self._get_num_days() - days_missing) * 24 \
@@ -158,8 +158,8 @@ class MontelDataGetter(BaseDataGetter):
         complete_days = self._get_num_days()
         if self.end_date == 'latest':
             now = datetime.now()
-            end = datetime.strptime(now.strftime("%Y-%m-%d"), "%Y-%m-%d")
-            last_day = datetime.strptime(data[-1]['Time'][:10], "%Y-%m-%d")
+            end = datetime.strptime(now.strftime('%Y-%m-%d'), '%Y-%m-%d')
+            last_day = datetime.strptime(data[-1]['Time'][:10], '%Y-%m-%d')
             days_missing = (end - last_day).days
             complete_days -= (days_missing + 1)
         for i in range(complete_days):

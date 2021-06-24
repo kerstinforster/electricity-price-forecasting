@@ -139,7 +139,7 @@ class BaseDataGetter(ABC):
         start = datetime.strptime(self.start_date, '%Y-%m-%d')
         if self.end_date == 'latest':
             now = datetime.now()
-            end = datetime.strptime(now.strftime("%Y-%m-%d"), "%Y-%m-%d")
+            end = datetime.strptime(now.strftime('%Y-%m-%d'), '%Y-%m-%d')
         else:
             end = datetime.strptime(self.end_date, '%Y-%m-%d')
         delta = end - start
