@@ -1,16 +1,13 @@
-# This is a sample Python script.
+# This is an example on hopw to use this project's code base.
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+from src.data.dataset_generator import DatasetGenerator
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    # Get the dataset
+    dg = DatasetGenerator(['all'])
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    dataset = dg.get_dataset('2016-01-01', '2021-06-24', 'T16')
+    print(dataset)
+    dataset_latest = dg.get_dataset('2016-01-01', 'latest', 'ignored')
+    print(dataset_latest)

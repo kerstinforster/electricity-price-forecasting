@@ -18,6 +18,7 @@ class MontelDataGetter(BaseDataGetter):
     The values are given in the unit EURO/MWh.
     Earliest date is: '2000-06-16'
     """
+
     def __init__(self, name: str = 'montel'):
         """
         Constructor for the Montel Data Getter
@@ -25,6 +26,7 @@ class MontelDataGetter(BaseDataGetter):
         super().__init__(name)
         self.token = 'VHwQF502L7rCkl-URyn0BvqzkFPZ_V9ovU5MOXYsDaUYbjVBGz37jJUx7Kgj01BEOxU6w3b8c6uxUWCEpXvQSZR_hKvL5ObPKNKAaV7a_iWmLPaa8aQmm9Whu2pK0sfa-e5pb_4R8XlMN8GAl8kci8nFWyR9bN2nBNR459ogXsHgoINsi142fQBHXWj7TVx7kKKFYuAwNiNNwXJfz-2q2DcNATrx6cco_QXkj2az7Tz0mBVaM-cWyN8ykWphitzWjrqEbhUEi73Mob1jNkrhfOTlqvErctozYeYvBFK7MON6Hc6paPPqr0FVByeFuU9kkUT-sT_DgIlbBpZWHqiu8rPeYgsC-sMxPpTAusKAhGjYa7oo4WvSH-5OLGnY3X0rzKP0ojFAasOhwFo7570oswt-AgtdISOf2c7LkTRDaJw'  # pylint: disable=C0301
         self._token_check()
+        self.now_date = datetime.now().strftime('%Y-%m-%d')
 
     def _token_check(self) -> None:
         """
@@ -63,7 +65,8 @@ class MontelDataGetter(BaseDataGetter):
             'spotKey': 14,  # This is the key we should use
             'fields': ['Base', 'Peak', 'Hours'],
             'fromDate': self.start_date,  # yyyy-mm-dd
-            'toDate': self.end_date,  # yyyy-mm-dd
+            'toDate': self.now_date if self.end_date == 'latest'
+            else self.end_date,  # yyyy-mm-dd
             'currency': 'eur',
             'sortType': 'ascending'
         }
@@ -83,7 +86,8 @@ class MontelDataGetter(BaseDataGetter):
         """
         processed_data = []
         data_el = data['Elements']
-        for element in data_el:
+        end_index = -1 if self.end_date == 'latest' else None
+        for element in data_el[:end_index]:
             element['Date'] = element['Date'][:10]
 
             # For the changes from summer to winter time we don't have 24 hours
@@ -100,7 +104,18 @@ class MontelDataGetter(BaseDataGetter):
                 data_point = dict()
                 data_point['Time'] = \
                     f'{element["Date"]}T{index:02d}'
-                data_point['Value'] = value['Value']
+                data_point['SPOTPrice'] = value['Value']
+                processed_data.append(data_point)
+
+        # Handle latest end date
+        if self.end_date == 'latest':
+            element = data_el[-1]
+            element['Date'] = element['Date'][:10]
+            for index, value in enumerate(element['TimeSpans']):
+                data_point = dict()
+                data_point['Time'] = \
+                    f'{element["Date"]}T{index:02d}'
+                data_point['SPOTPrice'] = value['Value']
                 processed_data.append(data_point)
 
         # Quick sanity check here
@@ -117,7 +132,16 @@ class MontelDataGetter(BaseDataGetter):
         """
         assert isinstance(data, list)
         assert isinstance(data[0], dict)
-        return len(data) == self._get_num_days() * 24
+        if self.end_date != 'latest':
+            return len(data) == self._get_num_days() * 24
+        else:
+            now = datetime.now()
+            end = datetime.strptime(now.strftime('%Y-%m-%d'), '%Y-%m-%d')
+            last_day = datetime.strptime(data[-1]['Time'][:10], '%Y-%m-%d')
+            last_time = int(data[-1]['Time'][11:])
+            days_missing = (end - last_day).days
+            return len(data) == (self._get_num_days() - days_missing) * 24 \
+                - 23 + last_time
 
     def repair_data(self, data: list) -> list:
         """
@@ -131,7 +155,14 @@ class MontelDataGetter(BaseDataGetter):
         df = pd.DataFrame(data=data)
         all_times = np.unique(list(df.Time))
         missing_dates = []
-        for i in range(self._get_num_days()):
+        complete_days = self._get_num_days()
+        if self.end_date == 'latest':
+            now = datetime.now()
+            end = datetime.strptime(now.strftime('%Y-%m-%d'), '%Y-%m-%d')
+            last_day = datetime.strptime(data[-1]['Time'][:10], '%Y-%m-%d')
+            days_missing = (end - last_day).days
+            complete_days -= (days_missing + 1)
+        for i in range(complete_days):
             for h in range(24):
                 time_str = (datetime.strptime(self.start_date, '%Y-%m-%d') +
                             timedelta(days=i, hours=h)).strftime('%Y-%m-%dT%H')
