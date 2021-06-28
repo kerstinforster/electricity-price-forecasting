@@ -1,0 +1,6 @@
+
+
+class GraphGenerator(object):
+    """
+
+    """

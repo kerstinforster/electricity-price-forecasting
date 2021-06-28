@@ -5,3 +5,5 @@ requests
 pandas
 sklearn
 coverage
+streamlit
+plotly
