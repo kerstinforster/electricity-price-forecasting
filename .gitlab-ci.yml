@@ -28,9 +28,10 @@ test:
     - source venv/bin/activate
     - pip install wheel
     - pip install -r requirements.txt
-    - python -m pytest
-  tags: 
-    - daedalus
+    - python -m pytest --cov --cov-report xml
+  artifacts:
+    reports:
+      cobertura: coverage.xml
 
 lint:
   stage: lint
@@ -44,5 +45,3 @@ lint:
     - source venv/bin/activate
     - pip install wheel pylint
     - pylint src test
-  tags: 
-    - daedalus
