@@ -29,6 +29,7 @@ test:
     - pip install wheel
     - pip install -r requirements.txt
     - python -m pytest --cov --cov-report xml
+    - coverage xml
   artifacts:
     reports:
       cobertura: coverage.xml
