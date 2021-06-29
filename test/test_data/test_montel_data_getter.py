@@ -6,7 +6,14 @@ import pandas as pd
 
 from src.data.montel_data_getter import *
 
+try:
+    _ = MontelDataGetter()
+    TOKEN_INVALID = False
+except PermissionError:
+    TOKEN_INVALID = True
 
+
+@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_init():
     dg = MontelDataGetter("montel_test")
     path = dg.get_project_root()
@@ -21,12 +28,14 @@ def test_init():
     os.removedirs(dg.data_dir)
 
 
+@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_show_all_datasets():
     dg = MontelDataGetter("montel_test")
     dg._show_available_datasets()
     os.removedirs(dg.data_dir)
 
 
+@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_get_and_process_data():
     dg = MontelDataGetter("montel_test")
 
@@ -42,6 +51,7 @@ def test_get_and_process_data():
     os.removedirs(dg.data_dir)
 
 
+@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_wrong_token():
     dg = MontelDataGetter("montel_test")
     dg.token = "wrong_token"
@@ -49,6 +59,7 @@ def test_wrong_token():
         dg._token_check()
 
 
+@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_check_data():
     dg = MontelDataGetter("montel_test")
     data = dict()
@@ -73,6 +84,7 @@ def test_check_data():
             processed_data[48 + i]['SPOTPrice']
 
 
+@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_loading():
     dg = MontelDataGetter("montel_test")
 
@@ -93,6 +105,7 @@ def test_loading():
     os.removedirs(dg.data_dir)
 
 
+@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_loading_latest():
     dg = MontelDataGetter("montel_test")
     data = dg.get_data('2020-01-01', 'latest')
