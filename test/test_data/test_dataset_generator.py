@@ -3,7 +3,14 @@ import pytest
 from src.data.dataset_generator import DatasetGenerator
 from src.data.montel_data_getter import MontelDataGetter
 
+try:
+    _ = MontelDataGetter()
+    MONTEL_TOKEN_INVALID = False
+except PermissionError:
+    MONTEL_TOKEN_INVALID = True
 
+
+@pytest.mark.skipif(MONTEL_TOKEN_INVALID, reason='Token invalid')
 def test_init():
     dg = DatasetGenerator()
     assert dg.datasets == ['montel']
@@ -19,11 +26,13 @@ def test_init():
         _ = DatasetGenerator(['invalid'])
 
 
+@pytest.mark.skipif(MONTEL_TOKEN_INVALID, reason='Token invalid')
 def test_dataset_generation():
     dg = DatasetGenerator()
     _ = dg.get_dataset('2020-01-01', 'latest', '')
 
 
+@pytest.mark.skipif(MONTEL_TOKEN_INVALID, reason='Token invalid')
 def test_merging_datasets():
     dg = DatasetGenerator(['montel', 'montel'])
     dataset = dg.get_dataset('2020-01-01', '2020-01-10', 'T16')
