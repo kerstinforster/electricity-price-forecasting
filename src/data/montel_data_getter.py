@@ -24,7 +24,7 @@ class MontelDataGetter(BaseDataGetter):
         Constructor for the Montel Data Getter
         """
         super().__init__(name)
-        self.token = 'VHwQF502L7rCkl-URyn0BvqzkFPZ_V9ovU5MOXYsDaUYbjVBGz37jJUx7Kgj01BEOxU6w3b8c6uxUWCEpXvQSZR_hKvL5ObPKNKAaV7a_iWmLPaa8aQmm9Whu2pK0sfa-e5pb_4R8XlMN8GAl8kci8nFWyR9bN2nBNR459ogXsHgoINsi142fQBHXWj7TVx7kKKFYuAwNiNNwXJfz-2q2DcNATrx6cco_QXkj2az7Tz0mBVaM-cWyN8ykWphitzWjrqEbhUEi73Mob1jNkrhfOTlqvErctozYeYvBFK7MON6Hc6paPPqr0FVByeFuU9kkUT-sT_DgIlbBpZWHqiu8rPeYgsC-sMxPpTAusKAhGjYa7oo4WvSH-5OLGnY3X0rzKP0ojFAasOhwFo7570oswt-AgtdISOf2c7LkTRDaJw'  # pylint: disable=C0301
+        self.token = 'b2VS2mo9xtNk6KIcZt-tJb1GyE4EvA-JPAgfKpueEHzN1zo8Hs6LiG5Ju2a9Xk-xZYHupmRu365Y_bLIdXb-VLTJvUltXYg0jXOa6ok89tOUM7-Q_yXod7s_CmOX_Sbtux-NOOVIkg0UJC6FrpkunvLMRl_ebFcx3au17EhjHkiDL74t4BdpynNVqqBGy9E-A5Zsf40tWGQOgdnXFekY0exaLdTps-z_1J3fAsHeOB4D5C2H0DD9rvvi2C7S0TxVdl5Jb9gMvLJMDtaQBlMbufKqeTq850xkX2En0UnVktNNYyXzByUbOlSKuVJ_-hF0HOFj9R5f4-0SXE5wEWyOFoXT9yJXaORyNx4RqYpwvGN6SenkENrfSc8ZUWQPackLU2jbYOWlWe3IOt62-svnID4YJKyYCTBSX8ClEpiL0NM'  # pylint: disable=C0301
         self._token_check()
         self.now_date = datetime.now().strftime('%Y-%m-%d')
 
