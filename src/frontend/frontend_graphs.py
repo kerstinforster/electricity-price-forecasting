@@ -5,7 +5,6 @@ import streamlit as st
 
 class GraphGenerator(object):
     """
-<<<<<<< HEAD
     This class is responsible for creating and displaying all necessary graph /
     plot elements in the frontend prototype.
     """
@@ -46,7 +45,3 @@ class GraphGenerator(object):
                      labels=self.time_price_labels
                      )
         st.write(fig)
-=======
-
-    """
->>>>>>> feat: streamlit frontend prototype, logo, options, graph, table
