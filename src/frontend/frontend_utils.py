@@ -89,3 +89,38 @@ def get_one_week_fill(df: pd.DataFrame) -> pd.DataFrame:
     df = adjust_time(df, n_days=7)
     df['TimeType'] = 'fill'
     return df
+
+
+def create_plot_df(past: pd.DataFrame,
+                   prediction: pd.DataFrame,
+                   required_prediction: str) -> pd.DataFrame:
+    """
+    Creates the dataframe necessary for the final prediction plot in the
+    frontend.
+    :param past: past data up to the current time
+    :param prediction: predicted electricity price
+    :param required_prediction: given timeframe of the prediction
+    :return: Dataframe with past, filler and prediction data for visualization
+    """
+
+    if required_prediction == "one_hour_prediction":
+        plot_df = past.append(prediction)
+
+    elif required_prediction == "one_day_prediction":
+        filler = get_one_day_fill(past)
+        past = past.tail(72)  # reducing past to 3 days for better visibility
+        plot_df = past.append(filler)
+        plot_df = plot_df.append(prediction)
+
+    elif required_prediction == "one_week_prediction":
+        filler = get_one_week_fill(past)
+        past = past.tail(168)  # reducing past to 1 week for better visibility
+        plot_df = past.append(filler)
+        plot_df = plot_df.append(prediction)
+
+    else:
+        raise ValueError('required_prediction has an invalid value in '
+                         'create_plot_df')
+
+    plot_df.reset_index(inplace=True)
+    return plot_df

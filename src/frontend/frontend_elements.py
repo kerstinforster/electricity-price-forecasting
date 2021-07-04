@@ -10,7 +10,7 @@ def create_header_logo() -> None:
     """
     Creates the header logo at the top of the web application
     """
-    st.image("resources/currence_logo_big.png")
+    st.image("src/frontend/resources/currence_logo_big.png")
 
 
 def create_comparison_table(past_string, past, prediction) -> None:
@@ -34,9 +34,15 @@ def create_comparison_table(past_string, past, prediction) -> None:
 
     cols = st.beta_columns(4)
     cols[0].write("Time")  # row label
-    cols[1].write(f'{past["Time"].iloc[0]}')
-    cols[2].write(f'{past["Time"].iloc[-1]}')
-    cols[3].write(f'{prediction["Time"]}')
+    cols[1].write(f'{past["Time"].iloc[0].time()}')
+    cols[2].write(f'{past["Time"].iloc[-1].time()}')
+    cols[3].write(f'{prediction["Time"].time()}')
+
+    cols = st.beta_columns(4)
+    cols[0].write("Date")  # row label
+    cols[1].write(f'{past["Time"].iloc[0].date()}')
+    cols[2].write(f'{past["Time"].iloc[-1].date()}')
+    cols[3].write(f'{prediction["Time"].date()}')
 
 
 def create_options_dropdown() -> (dict, st.selectbox):
@@ -51,7 +57,7 @@ def create_options_dropdown() -> (dict, st.selectbox):
         }
 
     choice = st.selectbox(
-        "Which price do you want to predicted?",
+        "Which price do you want predicted?",
         tuple(options.keys()))
 
     return options, choice

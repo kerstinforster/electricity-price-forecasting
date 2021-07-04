@@ -6,8 +6,6 @@ To start the frontend type "streamlit run web_app.py" in your terminal in the
 group03 repo
 """
 
-import streamlit as st
-import pandas as pd
 from src.data.montel_data_getter import MontelDataGetter
 from src.frontend.frontend_utils import *
 from src.frontend.frontend_graphs import GraphGenerator
@@ -67,27 +65,41 @@ def request_prediction(
 
 graph_generator = GraphGenerator()
 electricity_spot_data = request_montel_data()
-# Putting together the frontend components:
 
+# Putting together the frontend components:
 create_header_logo()
 
 st.title("Electricity price prediction:")
 
 options, choice = create_options_dropdown()
 
-# options logic
+# Options logic
 if options[choice] == "one_hour_prediction":
     st.subheader("Electricity price in 1 hour:")
-    plot_df = create_plot_df()
-    past, prediction = create_one_hour_pred_plot(electricity_spot_data)
+
+    past = get_last_24_hours_data(electricity_spot_data)
+    prediction = request_prediction(past, 'one_hour_prediction')
+    plot_df = create_plot_df(past, prediction, 'one_hour_prediction')
+
+    graph_generator.create_final_prediction_plot(plot_df)
     create_comparison_table("24 hours ago", past, prediction)
 
 elif options[choice] == "one_day_prediction":
     st.subheader("Electricity price in 1 day:")
-    past, prediction = create_one_day_pred_plot(electricity_spot_data)
+
+    past = get_last_7_days_data(electricity_spot_data)
+    prediction = request_prediction(past, 'one_day_prediction')
+    plot_df = create_plot_df(past, prediction, 'one_day_prediction')
+
+    graph_generator.create_final_prediction_plot(plot_df)
     create_comparison_table("1 week ago", past, prediction)
 
 elif options[choice] == "one_week_prediction":
     st.subheader("Electricity price in 1 week:")
-    past, prediction = create_one_week_pred_plot(electricity_spot_data)
-    create_comparison_table("4 week ago", past, prediction)
+
+    past = get_last_4_weeks_data(electricity_spot_data)
+    prediction = request_prediction(past, 'one_week_prediction')
+    plot_df = create_plot_df(past, prediction, 'one_week_prediction')
+
+    graph_generator.create_final_prediction_plot(plot_df)
+    create_comparison_table("4 weeks ago", past, prediction)

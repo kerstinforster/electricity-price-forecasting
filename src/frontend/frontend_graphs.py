@@ -1,6 +1,6 @@
+""" This class implements the plotting functionality for the frontend """
 import plotly.express as px
 import streamlit as st
-from frontend_utils import *
 
 
 class GraphGenerator(object):
@@ -11,8 +11,8 @@ class GraphGenerator(object):
 
     def __init__(self):
         self.color_discrete_map = {
-            'prediction': 'rgb(220, 80, 64)',
-            'past': 'rgb(57, 57, 57)',
+            'prediction': 'rgb(24, 37, 85)',
+            'past': 'rgb(100, 100, 100)',
             'fill': 'rgb(190, 190, 190)'
         }
 
@@ -21,67 +21,27 @@ class GraphGenerator(object):
             "Value": "Price [€ / MWh]"
         }
 
-    def create_raw_data_plot(self, df):
+    def create_raw_data_plot(self, plot_df) -> None:
         """
-
-        :param df:
-        :return:
+        Visualizes any given dataframe with the columns 'Time' and 'Value' as an
+        interactive bar plot
+        :param plot_df: dataframe to be plotted
         """
         fig = px.bar(
-            df, x='Time', y='Value',
+            plot_df, x='Time', y='Value',
             labels=self.time_price_labels
         )
         st.write(fig)
 
-    def create_one_hour_pred_plot(self, df):
-        past = get_last_24_hours_data(df)
-        prediction = request_prediction(past, 'one_hour_prediction')
-
-        plot_df = past.append(prediction)
-
+    def create_final_prediction_plot(self, plot_df) -> None:
+        """
+        Visualizes any given dataframe with the columns 'Time', 'Value' and
+        'TimeType' as an interactive bar plot
+        :param plot_df: dataframe to be plotted
+        """
         fig = px.bar(plot_df, x='Time', y='Value',
                      color='TimeType',
                      color_discrete_map=self.color_discrete_map,
                      labels=self.time_price_labels
                      )
         st.write(fig)
-
-        return past, prediction
-
-    def create_one_day_pred_plot(self, df):
-        past = get_last_7_days_data(df)
-        future_fill = get_one_day_fill(df)
-        prediction = request_prediction(past, 'one_day_prediction')
-
-        plot_df = past.append(future_fill)
-        plot_df = plot_df.append(prediction)
-        plot_df.reset_index(inplace=True)
-
-        fig = px.bar(plot_df, x='Time', y='Value',
-                     color='TimeType',
-                     color_discrete_map=self.color_discrete_map,
-                     labels=self.time_price_labels
-                     )
-
-        st.write(fig)
-        return past, prediction
-
-    def create_one_week_pred_plot(self, df):
-        past = get_last_4_weeks_data(df)
-        future_fill = get_one_week_fill(df)
-        prediction = request_prediction(past, 'one_week_prediction')
-
-        plot_df = past.append(future_fill)
-        plot_df = plot_df.append(prediction)
-        plot_df.reset_index(inplace=True)
-
-        # st.write(plot_df)
-
-        fig = px.bar(plot_df, x='Time', y='Value',
-                     color='TimeType',
-                     color_discrete_map=self.color_discrete_map,
-                     labels=self.time_price_labels
-                     )
-
-        st.write(fig)
-        return past, prediction
