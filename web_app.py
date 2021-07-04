@@ -21,6 +21,7 @@ def request_montel_data() -> pd.DataFrame:
 
     :return: Dataframe with columns 'Time' and 'Value'
     """
+    # TODO: switch to end_date='latest' when merging
     dg = MontelDataGetter()
     current_date = get_current_time()[0]
     return dg.get_data(end_date=current_date)
