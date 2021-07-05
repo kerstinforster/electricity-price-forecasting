@@ -1,4 +1,4 @@
-# This is an example on hopw to use this project's code base.
+# This is an example on how to use this project's code base.
 
 from src.data.dataset_generator import DatasetGenerator
 
