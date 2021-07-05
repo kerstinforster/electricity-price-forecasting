@@ -132,6 +132,11 @@ class MontelDataGetter(BaseDataGetter):
         """
         assert isinstance(data, list)
         assert isinstance(data[0], dict)
+        # Check that no duplicates
+        df = pd.DataFrame(data=data)
+        all_times = list(df.Time)
+        assert len(all_times) == len(set(all_times))
+
         if self.end_date != 'latest':
             return len(data) == self._get_num_days() * 24
         else:
@@ -153,7 +158,7 @@ class MontelDataGetter(BaseDataGetter):
         :return: The original list of dicts with added missing entries
         """
         df = pd.DataFrame(data=data)
-        all_times = np.unique(list(df.Time))
+        all_times = list(df.Time)
         missing_dates = []
         complete_days = self._get_num_days()
         if self.end_date == 'latest':
@@ -169,7 +174,7 @@ class MontelDataGetter(BaseDataGetter):
                 if not time_str in all_times:
                     missing_dates.append(time_str[:10])
                     start_index = i * 24 + h
-                    data.insert(start_index, data[start_index - 24])
+                    data.insert(start_index, data[start_index - 24].copy())
                     data[start_index]['Time'] = time_str
         print(f'Repaired missing montel data from dates: '
               f'{np.unique(missing_dates)}')
