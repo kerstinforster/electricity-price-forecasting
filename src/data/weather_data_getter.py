@@ -5,15 +5,15 @@ from datetime import datetime
 from meteostat import Point, Hourly
 from geopy.geocoders import Nominatim
 from pathlib import Path
-from data_getter import BaseDataGetter
+from src.data.data_getter import BaseDataGetter
 
 
 class WeatherDataGetter(BaseDataGetter):
     """
     This class is responsible for downloading the Weather data.
     This data contains Temperature(°C), Precipitation(mm), Wind Speed(km/h),
-    Humidity(%) and Atmospheric Pressure(hPa) in an hourly interval for a specific location.    
-    """
+    Humidity(%) and Atmospheric Pressure(hPa) in an hourly interval for a specific location.
+    pip """
     def __init__(self, name="weather", location="Munich, Germany"):
         """
         Constructor for the Weather Data Getter
@@ -23,13 +23,13 @@ class WeatherDataGetter(BaseDataGetter):
         self.location = location
         self.latitude = geolocator.geocode(location).latitude
         self.longitude = geolocator.geocode(location).longitude
+        self.now_date = datetime.now().strftime('%Y-%m-%dT%H')
 
     def check_data_coverage(self, data):
         """
         return Integer between 0 (no records) and 1 (all records)
         """
         print("Data coverage {0:.0%}".format(data.coverage()))
-        pass      
 
     def _get_raw_data(self):
         """
@@ -38,11 +38,13 @@ class WeatherDataGetter(BaseDataGetter):
         :return: meteostat.interface.hourly.Hourly object
         """
         position = Point(self.latitude, self.longitude)
-        # Get all the data point until the last hour of the last day
-        end_date = self.end_date + ' ' + '23:59'
+
+        # Get all the data point until the last hour of the last day        
+        end_date = self.now_date if self.end_date == "latest" \
+            else self.end_date + self.end_time
         data = Hourly(loc=position,
-                      start=datetime.strptime(self.start_date, '%Y-%m-%d'),
-                      end=datetime.strptime(end_date, '%Y-%m-%d %H:%M'))
+                      start=datetime.strptime(self.start_date, "%Y-%m-%d"),
+                      end=datetime.strptime(end_date, "%Y-%m-%dT%H"))
         # Check data coverage
         self.check_data_coverage(data)
 
@@ -60,6 +62,6 @@ class WeatherDataGetter(BaseDataGetter):
         return fp_data
 
 
-if __name__ == '__main__':    
+if __name__ == "__main__":
     wg = WeatherDataGetter()
     wg.get_data()
