@@ -13,8 +13,8 @@ def get_current_time() -> (str, str):
     :return: tuple of strings with date (yyyy-mm-dd) and time (HH:MM)
     """
     now = datetime.now()
-    date = now.strftime("%Y-%m-%d")
-    time = now.strftime("%H:%M")
+    date = now.strftime('%Y-%m-%d')
+    time = now.strftime('%H:%M')
     return date, time
 
 
@@ -103,16 +103,16 @@ def create_plot_df(past: pd.DataFrame,
     :return: Dataframe with past, filler and prediction data for visualization
     """
 
-    if required_prediction == "one_hour_prediction":
+    if required_prediction == 'one_hour_prediction':
         plot_df = past.append(prediction)
 
-    elif required_prediction == "one_day_prediction":
+    elif required_prediction == 'one_day_prediction':
         filler = get_one_day_fill(past)
         past = past.tail(72)  # reducing past to 3 days for better visibility
         plot_df = past.append(filler)
         plot_df = plot_df.append(prediction)
 
-    elif required_prediction == "one_week_prediction":
+    elif required_prediction == 'one_week_prediction':
         filler = get_one_week_fill(past)
         past = past.tail(168)  # reducing past to 1 week for better visibility
         plot_df = past.append(filler)

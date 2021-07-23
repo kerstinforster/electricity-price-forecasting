@@ -17,8 +17,8 @@ class GraphGenerator(object):
         }
 
         self.time_price_labels = {
-            "Time": "Time [h]",
-            "Value": "Price [€ / MWh]"
+            'Time': 'Time [h]',
+            'Value': 'Price [€ / MWh]'
         }
 
     def create_raw_data_plot(self, plot_df) -> None:
