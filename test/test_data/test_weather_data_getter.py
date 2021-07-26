@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from datetime import datetime
 
 from src.data.weather_data_getter import WeatherDataGetter
 
@@ -27,7 +28,22 @@ def test_get_and_process_data():
 
     df = pd.read_csv(os.path.join(wg.data_dir, 'data.csv'))
     df.head()
-    assert df.shape == (wg._get_num_days() * 24, 12)
+    assert df.shape == (wg._get_num_days() * 24, 8)
+
+    os.remove(os.path.join(wg.data_dir, 'data.csv'))
+    os.removedirs(wg.data_dir)
+
+
+def test_get_and_process_data_latest():
+    wg = WeatherDataGetter("weather_test")
+
+    wg.get_data('2021-01-01', 'latest', overwrite=True)
+
+    assert os.path.exists(os.path.join(wg.data_dir, 'data.csv'))
+
+    df = pd.read_csv(os.path.join(wg.data_dir, 'data.csv'))
+    df.head()
+    assert df.shape == (wg._get_num_days() * 24 - 23 + datetime.now().hour, 8)
 
     os.remove(os.path.join(wg.data_dir, 'data.csv'))
     os.removedirs(wg.data_dir)

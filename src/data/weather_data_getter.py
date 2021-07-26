@@ -1,4 +1,5 @@
 """ This class implements a data getter that downloads the weather data"""
+
 import os
 import pandas as pd
 from datetime import datetime
@@ -45,6 +46,7 @@ class WeatherDataGetter(BaseDataGetter):
         data = Hourly(loc=position,
                       start=datetime.strptime(self.start_date, "%Y-%m-%d"),
                       end=datetime.strptime(end_date, "%Y-%m-%dT%H"))
+        data = data.interpolate(1000)
         # Check data coverage
         self.check_data_coverage(data)
 
@@ -58,8 +60,31 @@ class WeatherDataGetter(BaseDataGetter):
         fp_data = data.fetch()
         fp_data.index.name = "Time"
         fp_data.reset_index(level=0, inplace=True)
-
+        fp_data = fp_data.drop(['snow', 'wpgt', 'wdir', 'coco'], axis=1)
+        if not self.check_data(fp_data):
+            raise ValueError('Weather Data is corrupted!')
+        if fp_data.isnull().values.any():
+            raise ValueError('Weather Data is not available with all columns '
+                             'for this time period. Please check your '
+                             'configuration!')
         return fp_data
+
+    def check_data(self, data: pd.DataFrame) -> bool:
+        """
+        Checks if the data was downloaded correctly.
+        :param data: The downloaded data
+        :return: bool True if download was successful, False otherwise
+        """
+
+        all_times = list(data.Time)
+        assert len(all_times) == len(set(all_times))
+
+        if self.end_date != 'latest':
+            expected_length = self._get_num_days() * 24
+        else:
+            expected_length = (self._get_num_days()) * 24 \
+                   - 23 + int(self.now_date[-2:])
+        return expected_length == len(data)
 
 
 if __name__ == "__main__":

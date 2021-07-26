@@ -5,3 +5,5 @@ requests
 pandas
 sklearn
 coverage
+meteostat
+geopy
