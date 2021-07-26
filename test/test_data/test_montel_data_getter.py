@@ -2,6 +2,7 @@
 
 import pytest
 import os
+import shutil
 import pandas as pd
 
 from src.data.montel_data_getter import *
@@ -23,16 +24,14 @@ def test_init():
     assert dg.data_dir == os.path.join(path, 'data', 'montel_test')
     assert dg.name == "montel_test"
     assert dg._root_dir == path
-    if os.path.exists(os.path.join(dg.data_dir, 'data.csv')):
-        os.remove(os.path.join(dg.data_dir, 'data.csv'))
-    os.removedirs(dg.data_dir)
+    shutil.rmtree(dg.data_dir)
 
 
 @pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_show_all_datasets():
     dg = MontelDataGetter("montel_test")
     dg._show_available_datasets()
-    os.removedirs(dg.data_dir)
+    shutil.rmtree(dg.data_dir)
 
 
 @pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
@@ -47,8 +46,7 @@ def test_get_and_process_data():
     df.head()
     assert df.shape == (dg._get_num_days() * 24, 2)
 
-    os.remove(os.path.join(dg.data_dir, 'data.csv'))
-    os.removedirs(dg.data_dir)
+    shutil.rmtree(dg.data_dir)
 
 
 @pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
@@ -101,8 +99,7 @@ def test_loading():
     # Get older data than is downloaded
     data_4 = dg.get_data('2019-01-01', '2020-12-31')
 
-    os.remove(os.path.join(dg.data_dir, 'data.csv'))
-    os.removedirs(dg.data_dir)
+    shutil.rmtree(dg.data_dir)
 
 
 @pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')

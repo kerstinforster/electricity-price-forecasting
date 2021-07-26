@@ -3,6 +3,7 @@ stock market price data"""
 
 import requests
 import json
+import os
 from typing import Any
 from datetime import datetime, timedelta
 import numpy as np
@@ -24,9 +25,27 @@ class MontelDataGetter(BaseDataGetter):
         Constructor for the Montel Data Getter
         """
         super().__init__(name)
-        self.token = 'b2VS2mo9xtNk6KIcZt-tJb1GyE4EvA-JPAgfKpueEHzN1zo8Hs6LiG5Ju2a9Xk-xZYHupmRu365Y_bLIdXb-VLTJvUltXYg0jXOa6ok89tOUM7-Q_yXod7s_CmOX_Sbtux-NOOVIkg0UJC6FrpkunvLMRl_ebFcx3au17EhjHkiDL74t4BdpynNVqqBGy9E-A5Zsf40tWGQOgdnXFekY0exaLdTps-z_1J3fAsHeOB4D5C2H0DD9rvvi2C7S0TxVdl5Jb9gMvLJMDtaQBlMbufKqeTq850xkX2En0UnVktNNYyXzByUbOlSKuVJ_-hF0HOFj9R5f4-0SXE5wEWyOFoXT9yJXaORyNx4RqYpwvGN6SenkENrfSc8ZUWQPackLU2jbYOWlWe3IOt62-svnID4YJKyYCTBSX8ClEpiL0NM'  # pylint: disable=C0301
-        self._token_check()
+        self.token = None
+        self.get_token()
         self.now_date = datetime.now().strftime('%Y-%m-%d')
+
+    def get_token(self):
+        file_path = os.path.join(self._root_dir, 'src', 'data',
+                                 'MONTEL_TOKEN.txt')
+        if not os.path.exists(file_path):
+            try:
+                token = json.loads(
+                    requests.get('https://coop.eikon.tum.de/mbt/mbt.json').text)[
+                    'access_token']
+            except json.decoder.JSONDecodeError:
+                raise ConnectionRefusedError(
+                    'Please connect to the MWN via a VPN network! See '
+                    'https://www.lrz.de/services/netz/mobil/vpn_en/ for help.')
+            with open(file_path, 'w') as file:
+                file.write(token)
+        with open(file_path, 'r') as file:
+            self.token = file.readline()
+        self._token_check()
 
     def _token_check(self) -> None:
         """
