@@ -58,8 +58,7 @@ class MontelDataGetter(BaseDataGetter):
         if response.status_code != 200:
             raise PermissionError(f'The MontelBearer Token seems to be invalid,'
                                   f' status {response.status_code}, \nresponse:'
-                                  f' {response.text} \n Most likely, you need'
-                                  f' to get the new key from moodle.tum.de')
+                                  f' {response.text} \n')
 
     def _show_available_datasets(self) -> None:
         """

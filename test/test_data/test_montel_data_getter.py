@@ -10,7 +10,7 @@ from src.data.montel_data_getter import *
 try:
     _ = MontelDataGetter()
     TOKEN_INVALID = False
-except PermissionError:
+except ConnectionRefusedError:
     TOKEN_INVALID = True
 
 
