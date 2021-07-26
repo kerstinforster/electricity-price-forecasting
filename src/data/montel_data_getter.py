@@ -35,12 +35,14 @@ class MontelDataGetter(BaseDataGetter):
         if not os.path.exists(file_path):
             try:
                 token = json.loads(
-                    requests.get('https://coop.eikon.tum.de/mbt/mbt.json').text)[
+                    requests.get(
+                        'https://coop.eikon.tum.de/mbt/mbt.json').text)[
                     'access_token']
-            except json.decoder.JSONDecodeError:
+            except json.decoder.JSONDecodeError as e:
                 raise ConnectionRefusedError(
                     'Please connect to the MWN via a VPN network! See '
-                    'https://www.lrz.de/services/netz/mobil/vpn_en/ for help.')
+                    'https://www.lrz.de/services/netz/mobil/vpn_en/ '
+                    'for help.') from e
             with open(file_path, 'w') as file:
                 file.write(token)
         with open(file_path, 'r') as file:
