@@ -1,8 +1,17 @@
 """ Validate that the frontend utility functions work as expected """
 
 import os
+import pytest
 from pathlib import Path
+
 from src.frontend.frontend_utils import *
+from src.data.montel_data_getter import MontelDataGetter
+
+try:
+    _ = MontelDataGetter()
+    TOKEN_INVALID = False
+except ConnectionRefusedError:
+    TOKEN_INVALID = True
 
 
 # Ugly test data fix cause this fkn shit montel token barely ever works:
@@ -10,14 +19,10 @@ def get_project_root():
     return Path(__file__).parent.parent.parent
 
 
-def get_test_df():
-    root_path = get_project_root()
-    data_path = os.path.join(root_path, 'data', 'montel', 'data.csv')
-    test_df = pd.read_csv(data_path)
-    return test_df.iloc[60000:68760]  # 1 year of test data
-
-
-global_test_df = get_test_df()
+@pytest.fixture
+def test_data():
+    dg = MontelDataGetter()
+    return dg.get_data(start_date='2016-01-01', end_date='2016-12-31')
 
 
 # Tests:
@@ -29,20 +34,23 @@ def test_get_current_time():
     assert len(time) == 5  # HH:MM
 
 
-def test_get_last_24h_data():
-    data_24h = get_last_24_hours_data(global_test_df)
+@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
+def test_get_last_24h_data(test_data):
+    data_24h = get_last_24_hours_data(test_data)
     assert data_24h['TimeType'].iloc[0] == 'past'
     assert len(data_24h) == 24
 
 
-def test_get_7_days_data():
-    data_168h = get_last_7_days_data(global_test_df)
+@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
+def test_get_7_days_data(test_data):
+    data_168h = get_last_7_days_data(test_data)
     assert data_168h['TimeType'].iloc[0] == 'past'
     assert len(data_168h) == 168
 
 
-def test_get_last_4_weeks_data():
-    data_672h = get_last_4_weeks_data(global_test_df)
+@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
+def test_get_last_4_weeks_data(test_data):
+    data_672h = get_last_4_weeks_data(test_data)
     assert data_672h['TimeType'].iloc[0] == 'past'
     assert len(data_672h) == 672
 
