@@ -28,9 +28,9 @@ def create_comparison_table(past_string, past, prediction) -> None:
 
     cols = st.beta_columns(4)
     cols[0].write("Price")  # row label
-    cols[1].write(f'{past["Value"].iloc[0]}')
-    cols[2].write(f'{past["Value"].iloc[-1]}')
-    cols[3].write(f'{prediction["Value"]}')
+    cols[1].write(f'{past["SPOTPrice"].iloc[0]}')
+    cols[2].write(f'{past["SPOTPrice"].iloc[-1]}')
+    cols[3].write(f'{prediction["SPOTPrice"]}')
 
     cols = st.beta_columns(4)
     cols[0].write("Time")  # row label

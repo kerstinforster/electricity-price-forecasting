@@ -19,7 +19,7 @@ def request_montel_data() -> pd.DataFrame:
     It unfortunately cannot be moved into 'src' because we cannot import from
     'data' into 'frontend' (application cannot resolve these paths and crashes).
 
-    :return: Dataframe with columns 'Time' and 'Value'
+    :return: Dataframe with columns 'Time' and 'SPOTPrice'
     """
     # TODO: switch to end_date='latest' when merging
     dg = MontelDataGetter()
@@ -39,7 +39,7 @@ def request_prediction(
 
     :param df: Dataframe with the necessary data for the prediction
     :param required_prediction: string that specifies time of the prediction
-    :return: Dataframe with a single row 'Time', 'Value', 'TimeType'
+    :return: Dataframe with a single row 'Time', 'SPOTPrice', 'TimeType'
     """
     if required_prediction == "one_hour_prediction":
         # TODO: this is a mock up, copies value 24h ago

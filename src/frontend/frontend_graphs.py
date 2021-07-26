@@ -28,7 +28,7 @@ class GraphGenerator(object):
         :param plot_df: dataframe to be plotted
         """
         fig = px.bar(
-            plot_df, x='Time', y='Value',
+            plot_df, x='Time', y='SPOTPrice',
             labels=self.time_price_labels
         )
         st.write(fig)
@@ -39,7 +39,7 @@ class GraphGenerator(object):
         'TimeType' as an interactive bar plot
         :param plot_df: dataframe to be plotted
         """
-        fig = px.bar(plot_df, x='Time', y='Value',
+        fig = px.bar(plot_df, x='Time', y='SPOTPrice',
                      color='TimeType',
                      color_discrete_map=self.color_discrete_map,
                      labels=self.time_price_labels
