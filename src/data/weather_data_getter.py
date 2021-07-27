@@ -80,10 +80,11 @@ class WeatherDataGetter(BaseDataGetter):
         assert len(all_times) == len(set(all_times))
 
         if self.end_date != 'latest':
-            expected_length = self._get_num_days() * 24
+            expected_length = self._get_num_days() * 24 \
+                - 23 + int(self.end_time[-2:])
         else:
             expected_length = (self._get_num_days()) * 24 \
-                   - 23 + int(self.now_date[-2:])
+                - 23 + int(self.now_date[-2:])
         return expected_length == len(data)
 
 
