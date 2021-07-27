@@ -219,12 +219,12 @@ class EntsoeDataGetter(BaseDataGetter):
         :return: Dataframe containing the downloaded data
         """
         data = self._get_load_data(self.start_date, self.end_date)
-        for key in self.field_name_map:
+        for key, value in self.field_name_map.items():
             data_temp = self._get_generation_data(key,
-                                                  self.field_name_map[key],
+                                                  value,
                                                   self.start_date,
                                                   self.end_date,
-                                                  (self.field_name_map[key],
+                                                  (value,
                                                    'Actual Consumption'))
             data = pd.merge(data, data_temp, left_on='time', right_on='time')
 
@@ -259,10 +259,11 @@ class EntsoeDataGetter(BaseDataGetter):
         assert len(all_times) == len(set(all_times))
 
         if self.end_date != 'latest':
-            expected_length = self._get_num_days() * 24
+            expected_length = self._get_num_days() * 24 \
+                - 23 + int(self.end_time[-2:])
         else:
             expected_length = (self._get_num_days()) * 24 \
-                   - 23 + int(self.now_date[-2:])
+                - 23 + int(self.now_date[-2:])
         return expected_length == len(data)
 
 
