@@ -2,6 +2,7 @@ import pytest
 
 from src.data.dataset_generator import DatasetGenerator
 from src.data.montel_data_getter import MontelDataGetter
+from src.data.weather_data_getter import WeatherDataGetter
 
 try:
     _ = MontelDataGetter()
@@ -13,14 +14,19 @@ except ConnectionRefusedError:
 @pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_init():
     dg = DatasetGenerator()
-    assert dg.datasets == ['montel']
+    assert dg.datasets == ['montel', 'weather']
     dg = DatasetGenerator(['all'])
-    assert dg.datasets == ['montel']
+    assert dg.datasets == ['montel', 'weather']
     dg = DatasetGenerator(['montel', 'montel'])
     assert dg.datasets == ['montel', 'montel']
     assert len(dg.data_getters) == 2
     for getter in dg.data_getters:
         assert isinstance(getter, MontelDataGetter)
+    dg = DatasetGenerator(['weather', 'weather'])
+    assert dg.datasets == ['weather', 'weather']
+    assert len(dg.data_getters) == 2
+    for getter in dg.data_getters:
+        assert isinstance(getter, WeatherDataGetter)
 
     with pytest.raises(ValueError):
         _ = DatasetGenerator(['invalid'])

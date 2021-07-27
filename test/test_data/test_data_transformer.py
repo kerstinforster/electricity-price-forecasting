@@ -19,4 +19,12 @@ def test_transforming():
     transformer = DataTransformer()
     transformed_data = transformer.transform_data(dataset)
     reverse_data = transformer.reverse_transform(transformed_data)
-    assert dataset.equals(reverse_data.round(4))
+
+    #import numpy as np
+    #a = dataset.to_numpy()
+    #b = reverse_data.round(4).to_numpy()
+    #x, y = np.where(a!=b)
+    #for x_, y_ in zip(x,y):
+    #    print(f"x{x_}/y{y_}/true{a[x_,y_]}/round{b[x_,y_]}")
+
+    assert dataset.round(4).equals(reverse_data.round(4))
