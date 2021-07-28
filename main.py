@@ -9,10 +9,10 @@ if __name__ == '__main__':
     dg = DatasetGenerator(['all'])
 
     # Get a dataset
-    dataset = dg.get_dataset('2016-01-01', '2021-06-24', 'T16')
+    dataset = dg.get_dataset('2018-01-01', '2021-06-24', 'T16')
     print(f'Dataset: \n{dataset}')
     # Get a dataset with the latest data
-    dataset_latest = dg.get_dataset('2016-01-01', 'latest', 'ignored')
+    dataset_latest = dg.get_dataset('2018-01-01', 'latest', 'ignored')
     print(f'Latest data: \n{dataset_latest}')
 
     # Create a data transformer for scaling data
