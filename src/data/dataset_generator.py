@@ -5,6 +5,7 @@ import pandas as pd
 
 from src.data.montel_data_getter import MontelDataGetter
 from src.data.entsoe_data_getter import EntsoeDataGetter
+from src.data.weather_data_getter import WeatherDataGetter
 
 
 class DatasetGenerator:
@@ -20,7 +21,7 @@ class DatasetGenerator:
         """
         self.datasets = datasets
         if self.datasets == ['all'] or self.datasets is None:
-            self.datasets = ['montel', 'entsoe']
+            self.datasets = ['montel', 'entsoe', 'weather']
         self.data_getters = \
             [DataGetterFactory.get(dataset) for dataset in self.datasets]
 
@@ -85,6 +86,8 @@ class DataGetterFactory:
             return MontelDataGetter()
         elif getter_name == 'entsoe':
             return EntsoeDataGetter()
+        elif getter_name == 'weather':
+            return WeatherDataGetter()
         else:
             raise ValueError(f'The data getter for type "{getter_name}" '
                              f'does not exist!')
