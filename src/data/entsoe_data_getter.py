@@ -321,7 +321,7 @@ class EntsoeDataGetter(BaseDataGetter):
         if self.start_date in missing_dates:
             raise RuntimeError('The start date you picked is too soon! '
                                'No data available for entsoe API.')
-        df = pd.DataFrame(data=data_list)
+        df = pd.DataFrame(data=data_list, dtype=object)
 
         # Fix too many items now
         current_end_time = pd.DatetimeIndex([df['Time'].values[-1]]).hour[0]

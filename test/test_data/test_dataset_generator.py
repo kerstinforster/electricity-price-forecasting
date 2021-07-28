@@ -35,7 +35,7 @@ def test_init():
 @pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_dataset_generation():
     dg = DatasetGenerator()
-    _ = dg.get_dataset('2020-01-01', 'latest', '')
+    _ = dg.get_dataset('2021-06-01', 'latest', '')
 
 
 @pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
