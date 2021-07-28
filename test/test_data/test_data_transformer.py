@@ -15,7 +15,7 @@ except ConnectionRefusedError:
 
 @pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_transforming():
-    dataset = DatasetGenerator().get_dataset('2016-01-01', '2017-01-01', 'T23')
+    dataset = DatasetGenerator().get_dataset('2018-01-01', '2019-01-01', 'T16')
     transformer = DataTransformer()
     transformed_data = transformer.transform_data(dataset)
     reverse_data = transformer.reverse_transform(transformed_data)

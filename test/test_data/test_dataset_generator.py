@@ -13,9 +13,9 @@ except ConnectionRefusedError:
 @pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_init():
     dg = DatasetGenerator()
-    assert dg.datasets == ['montel']
+    assert dg.datasets == ['montel', 'entsoe']
     dg = DatasetGenerator(['all'])
-    assert dg.datasets == ['montel']
+    assert dg.datasets == ['montel', 'entsoe']
     dg = DatasetGenerator(['montel', 'montel'])
     assert dg.datasets == ['montel', 'montel']
     assert len(dg.data_getters) == 2
