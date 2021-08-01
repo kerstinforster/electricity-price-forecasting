@@ -7,3 +7,5 @@ sklearn
 coverage
 streamlit
 plotly
+meteostat
+geopy
