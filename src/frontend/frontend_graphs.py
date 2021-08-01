@@ -23,8 +23,8 @@ class GraphGenerator(object):
 
     def create_raw_data_plot(self, plot_df) -> None:
         """
-        Visualizes any given dataframe with the columns 'Time' and 'Value' as an
-        interactive bar plot
+        Visualizes any given dataframe with the columns 'Time' and 'SPOTPrice'
+        as an interactive bar plot
         :param plot_df: dataframe to be plotted
         """
         fig = px.bar(
@@ -35,7 +35,7 @@ class GraphGenerator(object):
 
     def create_final_prediction_plot(self, plot_df) -> None:
         """
-        Visualizes any given dataframe with the columns 'Time', 'Value' and
+        Visualizes any given dataframe with the columns 'Time', 'SPOTPrice' and
         'TimeType' as an interactive bar plot
         :param plot_df: dataframe to be plotted
         """

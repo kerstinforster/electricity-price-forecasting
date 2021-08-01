@@ -22,7 +22,7 @@ def get_last_24_hours_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     Gets the last 24h of the time-series data and labels them as 'past'
     :param df: Dataframe that contains all the time-series data
-    :return: Dataframe with 24 rows and 3 columns
+    :return: Dataframe with 24 rows
     """
     df = df.tail(24).copy()
     df['TimeType'] = 'past'
@@ -33,7 +33,7 @@ def get_last_7_days_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     Gets the last 168h of the time-series data and labels them as 'past'
     :param df: Dataframe that contains all the time-series data
-    :return: Dataframe with 168 rows and 3 columns
+    :return: Dataframe with 168 rows
     """
     df = df.tail(168).copy()
     df['TimeType'] = 'past'
@@ -44,7 +44,7 @@ def get_last_4_weeks_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     Gets the last 672h of the time-series data and labels them as 'past'
     :param df: Dataframe that contains all the time-series data
-    :return: Dataframe with 672 rows and 3 columns
+    :return: Dataframe with 672 rows
     """
     df = df.tail(672).copy()
     df['TimeType'] = 'past'
