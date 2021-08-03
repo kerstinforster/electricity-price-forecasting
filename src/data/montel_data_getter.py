@@ -3,6 +3,7 @@ stock market price data"""
 
 import requests
 import json
+import os
 from typing import Any
 from datetime import datetime, timedelta
 import numpy as np
@@ -24,9 +25,29 @@ class MontelDataGetter(BaseDataGetter):
         Constructor for the Montel Data Getter
         """
         super().__init__(name)
-        self.token = 'b2VS2mo9xtNk6KIcZt-tJb1GyE4EvA-JPAgfKpueEHzN1zo8Hs6LiG5Ju2a9Xk-xZYHupmRu365Y_bLIdXb-VLTJvUltXYg0jXOa6ok89tOUM7-Q_yXod7s_CmOX_Sbtux-NOOVIkg0UJC6FrpkunvLMRl_ebFcx3au17EhjHkiDL74t4BdpynNVqqBGy9E-A5Zsf40tWGQOgdnXFekY0exaLdTps-z_1J3fAsHeOB4D5C2H0DD9rvvi2C7S0TxVdl5Jb9gMvLJMDtaQBlMbufKqeTq850xkX2En0UnVktNNYyXzByUbOlSKuVJ_-hF0HOFj9R5f4-0SXE5wEWyOFoXT9yJXaORyNx4RqYpwvGN6SenkENrfSc8ZUWQPackLU2jbYOWlWe3IOt62-svnID4YJKyYCTBSX8ClEpiL0NM'  # pylint: disable=C0301
-        self._token_check()
+        self.token = None
+        self.get_token()
         self.now_date = datetime.now().strftime('%Y-%m-%d')
+
+    def get_token(self):
+        file_path = os.path.join(self._root_dir, 'src', 'data',
+                                 'MONTEL_TOKEN.txt')
+        if not os.path.exists(file_path):
+            try:
+                token = json.loads(
+                    requests.get(
+                        'https://coop.eikon.tum.de/mbt/mbt.json').text)[
+                    'access_token']
+            except json.decoder.JSONDecodeError as e:
+                raise ConnectionRefusedError(
+                    'Please connect to the MWN via a VPN network! See '
+                    'https://www.lrz.de/services/netz/mobil/vpn_en/ '
+                    'for help.') from e
+            with open(file_path, 'w') as file:
+                file.write(token)
+        with open(file_path, 'r') as file:
+            self.token = file.readline()
+        self._token_check()
 
     def _token_check(self) -> None:
         """
@@ -39,8 +60,7 @@ class MontelDataGetter(BaseDataGetter):
         if response.status_code != 200:
             raise PermissionError(f'The MontelBearer Token seems to be invalid,'
                                   f' status {response.status_code}, \nresponse:'
-                                  f' {response.text} \n Most likely, you need'
-                                  f' to get the new key from moodle.tum.de')
+                                  f' {response.text} \n')
 
     def _show_available_datasets(self) -> None:
         """
@@ -132,6 +152,11 @@ class MontelDataGetter(BaseDataGetter):
         """
         assert isinstance(data, list)
         assert isinstance(data[0], dict)
+        # Check that no duplicates
+        df = pd.DataFrame(data=data)
+        all_times = list(df.Time)
+        assert len(all_times) == len(set(all_times))
+
         if self.end_date != 'latest':
             return len(data) == self._get_num_days() * 24
         else:
@@ -153,7 +178,7 @@ class MontelDataGetter(BaseDataGetter):
         :return: The original list of dicts with added missing entries
         """
         df = pd.DataFrame(data=data)
-        all_times = np.unique(list(df.Time))
+        all_times = list(df.Time)
         missing_dates = []
         complete_days = self._get_num_days()
         if self.end_date == 'latest':
@@ -169,7 +194,7 @@ class MontelDataGetter(BaseDataGetter):
                 if not time_str in all_times:
                     missing_dates.append(time_str[:10])
                     start_index = i * 24 + h
-                    data.insert(start_index, data[start_index - 24])
+                    data.insert(start_index, data[start_index - 24].copy())
                     data[start_index]['Time'] = time_str
         print(f'Repaired missing montel data from dates: '
               f'{np.unique(missing_dates)}')

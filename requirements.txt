@@ -3,4 +3,8 @@ pytest-cov
 pylint
 requests
 pandas
+sklearn
 coverage
+entsoe-py
+meteostat
+geopy
