@@ -31,9 +31,11 @@ pip install -r requirements.txt
 ```
 
 ## Execution
-Run the code:
-TBD
-
+Run the frontend / web application:
+Go to the root repository 'group03' in your terminal and then type:
+```console
+streamlit run web_app.py
+```
 
 ## Linter
 Run the linter:
