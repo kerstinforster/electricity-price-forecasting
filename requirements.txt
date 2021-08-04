@@ -10,3 +10,4 @@ plotly
 meteostat
 geopy
 jupyter
+numpy
