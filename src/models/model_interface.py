@@ -19,8 +19,8 @@ class BaseModel(ABC):
         self.model = None
 
     @abstractmethod
-    def train(self, x_train: pd.DataFrame, y_train: pd.DataFrame,
-              model_params: dict, save_at: str = None) -> Any:
+    def train(self, x_train: np.array, y_train: np.array, model_params: dict,
+              save_at: str = None) -> Any:
         """
         Trains a model with the provided data (x_train, y_train)
         :param x_train: np.array with (n_timesteps X n_features X n_step_size)
@@ -56,10 +56,3 @@ class BaseModel(ABC):
         :param path: path and model name in modelzoo
         """
         raise NotImplementedError('This is an abstract class method.')
-
-
-class ModelFactory():
-    """
-    Factory for
-    """
-
