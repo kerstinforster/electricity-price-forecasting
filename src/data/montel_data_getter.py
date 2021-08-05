@@ -58,9 +58,13 @@ class MontelDataGetter(BaseDataGetter):
             'https://api.montelnews.com/spot/getmetadata',
             headers={'Authorization': f'Bearer {self.token}'})
         if response.status_code != 200:
-            raise PermissionError(f'The MontelBearer Token seems to be invalid,'
-                                  f' status {response.status_code}, \nresponse:'
-                                  f' {response.text} \n')
+            print(f'The MontelBearer Token seems to be invalid, '
+                  f'status {response.status_code}, \nresponse:'
+                  f' {response.text} \nTrying to download updated token now!\n')
+            token_path = os.path.join(self._root_dir, 'src', 'data',
+                                      'MONTEL_TOKEN.txt')
+            os.remove(token_path)
+            self.get_token()
 
     def _show_available_datasets(self) -> None:
         """

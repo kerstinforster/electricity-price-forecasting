@@ -31,6 +31,10 @@ def test_get_and_process_data():
     df.head()
     assert df.shape == (eg._get_num_days() * 24, 5)
 
+    # Check that error is thrown on too old start date
+    with pytest.raises(ValueError):
+        eg.get_data('2014-01-01', '2014-02-01', 'T12')
+
     os.remove(os.path.join(eg.data_dir, 'data.csv'))
     os.removedirs(eg.data_dir)
 

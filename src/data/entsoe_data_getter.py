@@ -15,6 +15,8 @@ class EntsoeDataGetter(BaseDataGetter):
     This class is responsible for downloading the entso-e data.
     This data contains load data and electricity generation data in an hourly
     interval. Fields included are Solar, Wind Offshore / Onshore and Load data.
+
+    This data getter can only get data starting in the year 2015
     """
 
     def __init__(self, name: str = 'entsoe'):
@@ -221,6 +223,9 @@ class EntsoeDataGetter(BaseDataGetter):
         data for the end_date. The processing function deals with this issue.
         :return: Dataframe containing the downloaded data
         """
+        if int(self.start_date[:4]) < 2015:
+            raise ValueError('The start date for the entsoe getter needs to be '
+                             'after 2015-01-01')
         if self.end_date == 'latest':
             self.end_date = datetime.now().strftime('%Y-%m-%d')
             self.end_time = datetime.now().strftime('T%H')

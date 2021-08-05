@@ -50,14 +50,6 @@ def test_get_and_process_data():
 
 
 @pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
-def test_wrong_token():
-    dg = MontelDataGetter("montel_test")
-    dg.token = "wrong_token"
-    with pytest.raises(PermissionError):
-        dg._token_check()
-
-
-@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_check_data():
     dg = MontelDataGetter("montel_test")
     data = dict()
