@@ -67,6 +67,7 @@ class BaseDataGetter(ABC):
             self.download_data()
         if not end_index.size or self.end_date == 'latest':
             latest_end_date = pd.to_datetime(all_data['Time'].iloc[-1])
+            # Always download the latest 7 days
             one_week_earlier = latest_end_date - dt.timedelta(days=7)
             self.start_date = one_week_earlier.strftime('%Y-%m-%d')
             self.end_date = end_date
