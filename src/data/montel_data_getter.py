@@ -211,4 +211,4 @@ class MontelDataGetter(BaseDataGetter):
 
 if __name__ == '__main__':
     dg = MontelDataGetter()
-    dg.get_data()
+    dg.get_data('2020-12-31', '2021-04-02')

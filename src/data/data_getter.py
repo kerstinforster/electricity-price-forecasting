@@ -6,6 +6,7 @@ from pathlib import Path
 import os
 import numpy as np
 from datetime import datetime
+import datetime as dt
 import pandas as pd
 
 
@@ -46,8 +47,29 @@ class BaseDataGetter(ABC):
         self.start_date = start_date
         self.end_date = end_date
         self.end_time = end_time
-        if overwrite or end_date == 'latest' or\
-                not os.path.exists(os.path.join(self.data_dir, 'data.csv')):
+        if overwrite or not os.path.exists(
+                os.path.join(self.data_dir, 'data.csv')):
+            self.download_data()
+
+        # Get all current data to check if start and end date are contained
+        all_data = pd.read_csv(os.path.join(self.data_dir, 'data.csv'))
+        all_data['Time'] = pd.to_datetime(all_data['Time'])
+        # Get slice indices
+        start = pd.to_datetime(self.start_date + 'T00')
+        start_index = all_data.index[all_data['Time'] == start]
+        end_index = np.array([None]) if self.end_date == 'latest' else \
+            all_data.index[all_data['Time'] ==
+                           pd.to_datetime(self.end_date + self.end_time)] + 1
+        if not start_index.size:
+            self.start_date = start_date
+            self.end_date = pd.to_datetime(all_data['Time'][0])\
+                .strftime('%Y-%m-%d')
+            self.download_data()
+        if not end_index.size or self.end_date == 'latest':
+            latest_end_date = pd.to_datetime(all_data['Time'].iloc[-1])
+            one_week_earlier = latest_end_date - dt.timedelta(days=7)
+            self.start_date = one_week_earlier.strftime('%Y-%m-%d')
+            self.end_date = end_date
             self.download_data()
         return self.load_data()
 
@@ -66,6 +88,11 @@ class BaseDataGetter(ABC):
         processed_data = self._process_raw_data(data)
         df = pd.DataFrame(data=processed_data)
         df['Time'] = pd.to_datetime(df['Time'])
+        if os.path.exists(os.path.join(self.data_dir, 'data.csv')):
+            old_data = pd.read_csv(os.path.join(self.data_dir, 'data.csv'))
+            old_data['Time'] = pd.to_datetime(old_data['Time'])
+            df = pd.concat([old_data, df]).drop_duplicates(
+                subset='Time', keep='last').sort_values(by='Time')
         df.to_csv(os.path.join(self.data_dir, 'data.csv'), index=False)
 
     def load_data(self) -> pd.DataFrame:
