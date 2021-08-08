@@ -54,24 +54,34 @@ class BaseDataGetter(ABC):
         # Get all current data to check if start and end date are contained
         all_data = pd.read_csv(os.path.join(self.data_dir, 'data.csv'))
         all_data['Time'] = pd.to_datetime(all_data['Time'])
+
         # Get slice indices
         start = pd.to_datetime(self.start_date + 'T00')
         start_index = all_data.index[all_data['Time'] == start]
-        end_index = np.array([None]) if self.end_date == 'latest' else \
+        end_index = np.array([]) if self.end_date == 'latest' else \
             all_data.index[all_data['Time'] ==
                            pd.to_datetime(self.end_date + self.end_time)] + 1
+
         if not start_index.size:
             self.start_date = start_date
             self.end_date = pd.to_datetime(all_data['Time'][0])\
                 .strftime('%Y-%m-%d')
-            self.download_data()
+            if (pd.to_datetime(self.end_date) -
+                   pd.to_datetime(self.start_date)).days >= 0:
+                self.download_data()
         if not end_index.size or self.end_date == 'latest':
             latest_end_date = pd.to_datetime(all_data['Time'].iloc[-1])
             # Always download the latest 7 days
             one_week_earlier = latest_end_date - dt.timedelta(days=7)
             self.start_date = one_week_earlier.strftime('%Y-%m-%d')
             self.end_date = end_date
-            self.download_data()
+            comparison = datetime.now().strftime('%Y-%m-%d') \
+                if end_date == 'latest' else self.end_date
+            if (pd.to_datetime(comparison) -
+                   pd.to_datetime(self.start_date)).days >= 0:
+                self.download_data()
+        self.start_date = start_date
+        self.end_date = end_date
         return self.load_data()
 
     def download_data(self) -> None:
