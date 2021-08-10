@@ -97,7 +97,7 @@ def test_loading():
 @pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_loading_latest():
     dg = MontelDataGetter("montel_test")
-    data = dg.get_data('2020-01-01', 'latest')
-    data2 = dg.get_data('2020-01-01', '2020-06-01', 'T04')
+    data = dg.get_data('2021-01-01', 'latest')
+    data2 = dg.get_data('2021-01-01', '2021-06-01', 'T04')
     assert np.mod(len(data2.index), 24) == 5
     assert data.iloc[:len(data2.index), :].equals(data2)
