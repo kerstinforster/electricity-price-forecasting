@@ -37,11 +37,10 @@ def test_get_and_process_data():
 def test_get_and_process_data_latest():
     wg = WeatherDataGetter("weather_test")
 
-    wg.get_data('2021-01-01', 'latest', overwrite=True)
+    df = wg.get_data('2021-08-01', 'latest', overwrite=True)
 
     assert os.path.exists(os.path.join(wg.data_dir, 'data.csv'))
 
-    df = pd.read_csv(os.path.join(wg.data_dir, 'data.csv'))
     df.head()
     assert df.shape == (wg._get_num_days() * 24 - 23 + datetime.now().hour, 8)
 
