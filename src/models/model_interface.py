@@ -1,7 +1,6 @@
 """ THis file contains the base class for the prediction models"""
 
 from abc import ABC, abstractmethod
-import pandas as pd
 from typing import Any
 import numpy as np
 
@@ -10,13 +9,18 @@ class BaseModel(ABC):
     """
     An abstract interface for all prediction models
     """
-    def __init__(self, name: str):
+    def __init__(self, name: str, model_params: dict):
         """
-        Constructor for the prediction model setting the name field
+        Constructor for the prediction model setting the name field and the
+        specific model parameters
         :param name: name of the used algorithm, for example 'linear_regression'
         """
+        assert model_params, "model_params cannot be None for model: {}"\
+            .format(name)
         self.name = name
+        self.model_params = model_params
         self.model = None
+        self.model_trained = False
 
     @abstractmethod
     def train(self, x_train: np.array, y_train: np.array, model_params: dict,

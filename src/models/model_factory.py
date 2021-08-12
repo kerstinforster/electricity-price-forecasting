@@ -7,15 +7,17 @@ class ModelFactory:
     """
 
     @staticmethod
-    def get(model_name: str):
+    def get(model_name: str, model_params: dict):
         """
         Get a model instance based on the name of the model/algorithm
         :param model_name: name of the model/algorithm
+        :param model_params: dict with all the hyper-parameters for the
+        requested model (only one each)
         :return: class instance of the model
         """
 
         if model_name == 'linear_regression':
-            return LinearRegressionModel()
+            return LinearRegressionModel(model_params)
 
         elif model_name == 'prophet':
             pass

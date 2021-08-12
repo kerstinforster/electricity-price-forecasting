@@ -10,16 +10,15 @@ import pickle as pkl
 class LinearRegressionModel(BaseModel):
     """
     This class implements linear regression as an example/baseline model
-    for the eletricity price prediction task
+    for the electricity price prediction task
     """
 
-    def __init__(self, name: str = 'linear_regression'):
+    def __init__(self, model_params: dict, name: str = 'linear_regression'):
         """
         Constructor for the linear regression example/baseline model
         """
-        super().__init__(name)
+        super().__init__(name, model_params)
         self.model = LinearRegression(n_jobs=-1)
-        self.model_trained = False
 
     def train(self, x_train: np.array, y_train: np.array, model_params: dict,
               save_at: str = None) -> Any:
@@ -51,7 +50,7 @@ class LinearRegressionModel(BaseModel):
     def save(self, path: str):
         """
         Saves the model at the given path with the given name
-        :param path: path and model name in modelzoo
+        :param path: path and model name at location where model should be saved
         """
         if self.model_trained:
             # TODO: fix path to modelzoo here
@@ -63,7 +62,8 @@ class LinearRegressionModel(BaseModel):
     def load(self, path: str):
         """
         Loads the model from the given path
-        :param path: path and model name in modelzoo
+        :param path: path and model name at location where model should be
+        loaded from
         """
         self.model_trained = True
         # TODO: fix path to modelzoo here
