@@ -70,7 +70,7 @@ class WeatherDataGetter(BaseDataGetter):
                              'for this time period. Please check your '
                              'configuration!')
         fp_data = fp_data.add_suffix(self.suffix)
-        fp_data.rename(columns={f'Time{self.suffix}': 'Time'})
+        fp_data = fp_data.rename(columns={f'Time{self.suffix}': 'Time'})
         return fp_data
 
     def check_data(self, data: pd.DataFrame) -> bool:
