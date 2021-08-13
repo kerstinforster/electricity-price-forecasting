@@ -90,7 +90,7 @@ class DataGetterFactory:
             return WeatherDataGetter()
         elif getter_name == 'weather_hamburg':
             return WeatherDataGetter(name='weather_hamburg',
-                                     location="hamburg, germany",
+                                     location='hamburg, germany',
                                      suffix='_ham')
         else:
             raise ValueError(f'The data getter for type "{getter_name}" '
