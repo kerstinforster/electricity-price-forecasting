@@ -15,13 +15,15 @@ class WeatherDataGetter(BaseDataGetter):
     specific location.
     pip """
 
-    def __init__(self, name='weather', location='Munich, Germany'):
+    def __init__(self, name='weather', location='Munich, Germany',
+                 suffix='_muc'):
         """
         Constructor for the Weather Data Getter
         """
         super().__init__(name)
         geolocator = Nominatim(user_agent='weather_agent')
         self.location = location
+        self.suffix = suffix
         self.latitude = geolocator.geocode(location).latitude
         self.longitude = geolocator.geocode(location).longitude
         self.now_date = datetime.now().strftime('%Y-%m-%dT%H')
@@ -67,6 +69,8 @@ class WeatherDataGetter(BaseDataGetter):
             raise ValueError('Weather Data is not available with all columns '
                              'for this time period. Please check your '
                              'configuration!')
+        fp_data = fp_data.add_suffix(self.suffix)
+        fp_data.rename(columns={f'Time{self.suffix}': 'Time'})
         return fp_data
 
     def check_data(self, data: pd.DataFrame) -> bool:

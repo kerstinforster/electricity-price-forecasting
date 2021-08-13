@@ -21,7 +21,7 @@ class DatasetGenerator:
         """
         self.datasets = datasets
         if self.datasets == ['all'] or self.datasets is None:
-            self.datasets = ['montel', 'entsoe', 'weather']
+            self.datasets = ['montel', 'entsoe', 'weather', 'weather_hamburg']
         self.data_getters = \
             [DataGetterFactory.get(dataset) for dataset in self.datasets]
 
@@ -88,6 +88,10 @@ class DataGetterFactory:
             return EntsoeDataGetter()
         elif getter_name == 'weather':
             return WeatherDataGetter()
+        elif getter_name == 'weather_hamburg':
+            return WeatherDataGetter(name='weather_hamburg',
+                                     location="hamburg, germany",
+                                     suffix='_ham')
         else:
             raise ValueError(f'The data getter for type "{getter_name}" '
                              f'does not exist!')
