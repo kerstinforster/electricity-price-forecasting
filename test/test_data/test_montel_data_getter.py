@@ -50,14 +50,6 @@ def test_get_and_process_data():
 
 
 @pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
-def test_wrong_token():
-    dg = MontelDataGetter("montel_test")
-    dg.token = "wrong_token"
-    with pytest.raises(PermissionError):
-        dg._token_check()
-
-
-@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_check_data():
     dg = MontelDataGetter("montel_test")
     data = dict()
@@ -105,7 +97,7 @@ def test_loading():
 @pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_loading_latest():
     dg = MontelDataGetter("montel_test")
-    data = dg.get_data('2020-01-01', 'latest')
-    data2 = dg.get_data('2020-01-01', '2020-06-01', 'T04')
+    data = dg.get_data('2021-01-01', 'latest')
+    data2 = dg.get_data('2021-01-01', '2021-06-01', 'T04')
     assert np.mod(len(data2.index), 24) == 5
     assert data.iloc[:len(data2.index), :].equals(data2)

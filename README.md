@@ -8,7 +8,6 @@ This is the project repository of group 3 for the course Applied Machine Intelli
 Group Members:
 - Adrian Michl (MTK: 03672576)
 - Anna Mrosik (MTK: 03695133)
-- Farouk Ferjani (MTK: 03666175)
 - Florian Mysliwetz (MTK: 03671374)
 - Jakob Kruse (MTK: 03682020)
 - Kerstin Forster (MTK: 03696804)

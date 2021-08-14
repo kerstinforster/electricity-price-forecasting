@@ -5,6 +5,7 @@ requests
 pandas
 sklearn
 coverage
+entsoe-py
 streamlit
 plotly
 meteostat
