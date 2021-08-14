@@ -66,6 +66,7 @@ class BaseDataGetter(ABC):
             self.start_date = start_date
             self.end_date = pd.to_datetime(all_data['Time'][0])\
                 .strftime('%Y-%m-%d')
+            self.end_time = 'T23'
             if (pd.to_datetime(self.end_date) -
                    pd.to_datetime(self.start_date)).days >= 0:
                 self.download_data()
