@@ -42,8 +42,8 @@ def test_get_and_process_data():
 def test_get_and_process_data_latest():
     eg = EntsoeDataGetter("entsoe_test")
 
-    expected_size = (eg._get_num_days() * 24 - 23 + datetime.now().hour, 5)
     eg.get_data('2021-08-01', 'latest', overwrite=True)
+    expected_size = (eg._get_num_days() * 24 - 23 + datetime.now().hour, 5)
 
     assert os.path.exists(os.path.join(eg.data_dir, 'data.csv'))
 
