@@ -7,14 +7,7 @@ import pandas as pd
 
 from src.data.montel_data_getter import *
 
-try:
-    _ = MontelDataGetter()
-    TOKEN_INVALID = False
-except ConnectionRefusedError:
-    TOKEN_INVALID = True
 
-
-@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_init():
     dg = MontelDataGetter("montel_test")
     path = dg.get_project_root()
@@ -27,14 +20,12 @@ def test_init():
     shutil.rmtree(dg.data_dir)
 
 
-@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_show_all_datasets():
     dg = MontelDataGetter("montel_test")
     dg._show_available_datasets()
     shutil.rmtree(dg.data_dir)
 
 
-@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_get_and_process_data():
     dg = MontelDataGetter("montel_test")
 
@@ -49,7 +40,6 @@ def test_get_and_process_data():
     shutil.rmtree(dg.data_dir)
 
 
-@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_check_data():
     dg = MontelDataGetter("montel_test")
     data = dict()
@@ -74,7 +64,6 @@ def test_check_data():
             processed_data[48 + i]['SPOTPrice']
 
 
-@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_loading():
     dg = MontelDataGetter("montel_test")
 
@@ -94,7 +83,6 @@ def test_loading():
     shutil.rmtree(dg.data_dir)
 
 
-@pytest.mark.skipif(TOKEN_INVALID, reason='Token invalid')
 def test_loading_latest():
     dg = MontelDataGetter("montel_test")
     data = dg.get_data('2021-01-01', 'latest')

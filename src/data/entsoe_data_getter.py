@@ -265,9 +265,11 @@ class EntsoeDataGetter(BaseDataGetter):
             current_end_time = pd.DatetimeIndex(
                 [data['Time'].values[-1]]).hour[0]
             wanted_end_time = int(self.end_time[-2:])
-            if current_end_time != wanted_end_time:
+            if current_end_time > wanted_end_time:
                 data = \
                     data.iloc[:-(current_end_time - wanted_end_time), :]
+            elif current_end_time < wanted_end_time:
+                data = self.repair_data(data)
             assert pd.DatetimeIndex([data['Time'].values[-1]]).hour[0] \
                    == wanted_end_time
 
@@ -323,9 +325,6 @@ class EntsoeDataGetter(BaseDataGetter):
 
         print(f'Repaired missing entsoe data from dates: '
               f'{np.unique(missing_dates)}')
-        if self.start_date in missing_dates:
-            raise RuntimeError('The start date you picked is too soon! '
-                               'No data available for entsoe API.')
         df = pd.DataFrame(data=data_list, dtype=object)
 
         # Fix too many items now

@@ -40,8 +40,8 @@ class DatasetGenerator:
             # Also, the timestamps in all datasets should be the same!
             data.append(getter.get_data(start_date, end_date, end_time))
         dataset = data[0]
-        if end_date == 'latest':
-            data = self.adjust_dataset_lengths(data)
+
+        data = self.adjust_dataset_lengths(data)
 
         for i in range(1, len(data)):
             assert len(data[i].index) == len(data[0].index)
