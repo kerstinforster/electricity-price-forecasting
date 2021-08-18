@@ -1,3 +1,5 @@
+""" This class implements a factory for models"""
+
 from linear_regression_model import LinearRegressionModel
 
 

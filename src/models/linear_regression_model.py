@@ -20,8 +20,8 @@ class LinearRegressionModel(BaseModel):
         super().__init__(name, model_params)
         self.model = LinearRegression(n_jobs=-1)
 
-    def train(self, x_train: np.array, y_train: np.array, model_params: dict,
-              save_at: str = None) -> Any:
+    def train(self, x_train: np.array, y_train: np.array, model_params: dict,  # pylint: disable=unused-argument
+              save_at: str = None) -> Any:                                     # pylint: disable=unused-argument
         """
         Trains a model with the provided data (x_train, y_train)
         :param x_train: np.array with (n_timesteps X n_features X n_step_size)
@@ -44,8 +44,8 @@ class LinearRegressionModel(BaseModel):
         if self.model_trained:
             return self.model.predict(x_input)
         else:
-            raise ValueError("Linear Regression model has to be trained or "
-                             "loaded before predictions can be made.")
+            raise ValueError('Linear Regression model has to be trained or '
+                             'loaded before predictions can be made.')
 
     def save(self, path: str):
         """
@@ -56,8 +56,8 @@ class LinearRegressionModel(BaseModel):
             # TODO: fix path to modelzoo here
             pkl.dump(self.model, path)
         else:
-            raise ValueError("The linear regression model should be trained "
-                             "before it is saved.")
+            raise ValueError('The linear regression model should be trained '
+                             'before it is saved.')
 
     def load(self, path: str):
         """
