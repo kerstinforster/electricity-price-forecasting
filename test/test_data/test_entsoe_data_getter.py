@@ -42,7 +42,7 @@ def test_get_and_process_data():
 def test_get_and_process_data_latest():
     eg = EntsoeDataGetter("entsoe_test")
 
-    eg.get_data('2021-01-01', 'latest', overwrite=True)
+    eg.get_data('2021-08-01', 'latest', overwrite=True)
 
     assert os.path.exists(os.path.join(eg.data_dir, 'data.csv'))
 
