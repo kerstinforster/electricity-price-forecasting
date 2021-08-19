@@ -1,9 +1,12 @@
 # This is an example on how to use this project's code base.
 
+import pandas as pd
+
 from src.data.dataset_generator import DatasetGenerator
 from src.data.data_transformer import DataTransformer
 from src.data.data_splitter import DataSplitter, train_test_split
 from src.models.linear_regression_model import LinearRegressionModel
+from src.models.sarimax_model import SARIMAXModel
 
 
 if __name__ == '__main__':
@@ -29,13 +32,21 @@ if __name__ == '__main__':
     print(f'X_Test: {x_test.shape}')
     print(f'Y_Test: {y_test.shape}')
 
-    # Train model
+    # Train linear regression model model
     model = LinearRegressionModel({})
     model.train(x_train, y_train, {})
-    # Prediction
     prediction = model.predict(x_test[0, :, :])
     print(f'True value: {y_test[0, :]}')
     print(f'Pred value: {prediction}')
+
+    # Test SARIMAX model
+    # sarimax = SARIMAXModel({'gap': 0, 'spot_index': 0})
+    # sarimax_data = train[30000:].append(test[:7*24]).drop(
+    #     'Time', axis=1).T.values
+    # print(f'SARIMAX Shape: {sarimax_data.shape}')
+    # sarimax_pred = sarimax.predict(sarimax_data)
+    # print(f'SARIMAX Pred value: {sarimax_pred}')
+
     # Revert the scaling of the prediction
     print(f'Reverse-transformed prediction: \n'
           f'{dt.reverse_transform_spot(prediction)}')
