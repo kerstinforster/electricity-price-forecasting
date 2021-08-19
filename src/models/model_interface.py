@@ -15,8 +15,6 @@ class BaseModel(ABC):
         specific model parameters
         :param name: name of the used algorithm, for example 'linear_regression'
         """
-        assert model_params, 'model_params cannot be None for model: {}'\
-            .format(name)
         self.name = name
         self.model_params = model_params
         self.model = None

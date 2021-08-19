@@ -1,10 +1,11 @@
 """ This class implements a linear regression model that predicts """
 
 import numpy as np
-from model_interface import BaseModel
-from sklearn.linear_model import LinearRegression
-from typing import Any
 import pickle as pkl
+from typing import Any
+from sklearn.linear_model import LinearRegression
+
+from src.models.model_interface import BaseModel
 
 
 class LinearRegressionModel(BaseModel):
@@ -24,14 +25,17 @@ class LinearRegressionModel(BaseModel):
               save_at: str = None) -> Any:                                     # pylint: disable=unused-argument
         """
         Trains a model with the provided data (x_train, y_train)
-        :param x_train: np.array with (n_timesteps X n_features X n_step_size)
-        :param y_train: np.array with (n_timesteps X n_labels)
+        :param x_train: np.array with (n_samples X n_features X window_length)
+        :param y_train: np.array with (n_samples X n_labels)
         :param model_params: dictionary which sets the relevant hyperparameters
         :param save_at: saves model at given path with given name if not None
         :return: trained instance of the model
         """
-        # TODO: check if this algo also takes multivariate regression tasks
-        self.model.fit(x_train, y_train)
+        # Input for linear regression is (n_samples, n_features) dimensional
+        x = x_train.reshape(x_train.shape[0],
+                            (x_train.shape[1] * x_train.shape[2]))
+
+        self.model.fit(x, y_train)
         self.model_trained = True
 
     def predict(self, x_input: np.array) -> np.array:
@@ -41,8 +45,9 @@ class LinearRegressionModel(BaseModel):
         :return: Correctly timestamped pandas dataframe with the predicted
         value/s
         """
+        x = x_input.reshape(1, x_input.shape[0] * x_input.shape[1])
         if self.model_trained:
-            return self.model.predict(x_input)
+            return self.model.predict(x)
         else:
             raise ValueError('Linear Regression model has to be trained or '
                              'loaded before predictions can be made.')
