@@ -1,16 +1,47 @@
-""" This class implements a data splitter that creates our training, test and
-validation sets, which are ready to be used for our models"""
+""" This class implements a data splitter that creates training samples,
+which are ready to be used for our models"""
 
-# TODO: implement necessary functions for data splitting in training, test
-#  and validation sets
+import pandas as pd
+import numpy as np
 
-# TODO: also need functionality to create labels y_t (t+1, t+24, t+168)
 
-# For every label y_t (n_labels x 1) there has to be an input x_t which is a
-# matrix (n_features x n_time_steps)
-# The labels have to created from the spot market price time series data.
-# Every label y_t has to be either t+1, t+24 or t+168 timesteps in the future
-# relative to its input x_t.
+class DataSplitter:
+    """
+    This class splits the preprocessed dataframe into training and testing
+    samples. First, the dataframe
+    """
+    def __init__(self, window_size: int):
+        self.window_size = window_size
 
-# TODO: find efficient solution with Jakob (saving this many matrices x_t might
-#  be inefficient)
+    def split(self, data: pd.DataFrame, gap: int):
+        """
+        Splitting the dataset with a sliding window evaluation method
+        As a queue the training set and validation value are moving on
+        one position after each iteration
+        Between the training set and the validation set is a gap for skipped
+        values
+        (+1h: gap=0; +24h: gap=23; +168h: gap = 167)
+
+        :param data: Dataframe of dimensions (N_Timesteps, N_Features)
+        :param gap: skipped values between training and validation set
+        :return X_split: np.array (n_samples X n_features X window_length)
+        :return: Y_split: np.array (n_samples X n_features)
+        """
+        data = data.drop(['Time'], axis=1)
+        x_data = data.T.to_numpy()
+        y_data = np.expand_dims(data.SPOTPrice.to_numpy(), 0)
+        x = []
+        y = []
+        for i in range(x_data.shape[1] - self.window_size - gap):
+            x.append(x_data[:, i:self.window_size + i])
+            y.append(y_data[:, i+self.window_size+gap:i+self.window_size+gap+1])
+        x_split = np.concatenate([x], axis=0)
+        y_split = np.concatenate([y], axis=0)
+
+        return x_split, y_split[:, :, 0]
+
+
+def train_test_split(data: pd.DataFrame, test_size: float = 0.2):
+    rows = data.shape[0]
+    split_index = int((1-test_size) * rows)
+    return data[:split_index], data[split_index:]
