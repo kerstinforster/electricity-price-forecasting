@@ -7,6 +7,7 @@ from src.data.data_transformer import DataTransformer
 from src.data.data_splitter import DataSplitter, train_test_split
 from src.models.linear_regression_model import LinearRegressionModel
 from src.models.lstm_model import LSTMModel
+from src.models.sarimax_model import SARIMAXModel
 
 if __name__ == '__main__':
     model_params = {
@@ -41,27 +42,33 @@ if __name__ == '__main__':
     test_y = test.SPOTPrice.values[7*24]
 
     # Train linear regression model model
-    #model = LinearRegressionModel({})
-    #model.train(train_dataset, test_dataset, {})
-    #prediction = model.predict(test_x)
-    #print(f'True value: {test_y}')
-    #print(f'Pred value: {prediction}')
+    model = LinearRegressionModel({})
+    model.train(train_dataset, test_dataset, {})
+    linear_prediction = model.predict(test_x)
+    print(f'True value: {test_y}')
+    print(f'Pred value: {linear_prediction}')
 
     # Train LSTM model
     model = LSTMModel(model_params)
-    model.train(train_dataset, test_dataset, {'epochs': 100})
-    prediction = model.predict(test_x)
+    model.train(train_dataset, test_dataset, {'epochs': 3})
+    lstm_prediction = model.predict(test_x)
     print(f'True value: {test_y}')
-    print(f'Pred value: {prediction}')
+    print(f'Pred value: {lstm_prediction}')
 
     # Test SARIMAX model
-    # sarimax = SARIMAXModel({'gap': 0, 'spot_index': 0})
-    # sarimax_data = train[30000:].append(test[:7*24]).drop(
-    #     'Time', axis=1).T.values
-    # print(f'SARIMAX Shape: {sarimax_data.shape}')
-    # sarimax_pred = sarimax.predict(sarimax_data)
-    # print(f'SARIMAX Pred value: {sarimax_pred}')
+    sarimax = SARIMAXModel({'gap': 0, 'spot_index': 0})
+    sarimax_data = train[30000:].append(test[:7*24]).drop(
+       'Time', axis=1).T.values
+    print(f'SARIMAX Shape: {sarimax_data.shape}')
+    sarimax_prediction = sarimax.predict(sarimax_data)
+    print(f'SARIMAX Pred value: {sarimax_prediction}')
 
     # Revert the scaling of the prediction
-    #print(f'Reverse-transformed prediction: \n'
-    #      f'{dt.reverse_transform_spot(prediction)}')
+    print(f'Reverse-transformed Linear prediction: \n'
+          f'{dt.reverse_transform_spot(linear_prediction)}')
+    print(f'Reverse-transformed LSTM prediction: \n'
+          f'{dt.reverse_transform_spot(lstm_prediction)}')
+    print(f'Reverse-transformed SARIMAX prediction: \n'
+          f'{dt.reverse_transform_spot(sarimax_prediction)}')
+    print(f'Reverse-transformed true value: \n'
+          f'{dt.reverse_transform_spot(np.array([test_y]))}')
