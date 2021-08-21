@@ -20,32 +20,43 @@ class LinearRegressionModel(BaseModel):
         """
         super().__init__(name, model_params)
         self.model = LinearRegression(n_jobs=-1)
+        self.window_size = model_params.get('window_size', 7 * 24)
+        self.gap = model_params.get('gap', 0)
+        self.n_features = model_params.get('num_features', 19)
+        self.batch_size = model_params.get('batch_size', 64)
 
-    def train(self, x_train: np.array, y_train: np.array, model_params: dict,  # pylint: disable=unused-argument
-              save_at: str = None) -> Any:                                     # pylint: disable=unused-argument
+    def train(self, dataset: Any, test_dataset: Any, model_params: dict,  # pylint: disable=unused-argument
+              save_at: str = None) -> Any:                                # pylint: disable=unused-argument
         """
         Trains a model with the provided data (x_train, y_train)
-        :param x_train: np.array with (n_samples X n_features X window_length)
-        :param y_train: np.array with (n_samples X n_labels)
+        :param dataset: np.array with (n_samples X n_features X window_length)
+        :param test_dataset: np.array with (n_samples X n_labels)
         :param model_params: dictionary which sets the relevant hyperparameters
         :param save_at: saves model at given path with given name if not None
         :return: trained instance of the model
         """
         # Input for linear regression is (n_samples, n_features) dimensional
-        x = x_train.reshape(x_train.shape[0],
-                            (x_train.shape[1] * x_train.shape[2]))
-
-        self.model.fit(x, y_train)
+        total_input = np.empty(shape=(1, self.window_size * self.n_features))
+        total_target = np.empty(shape=(1))
+        for batch in dataset:
+            input, target = batch
+            input = np.reshape(input, (input.shape[0], -1))
+            total_input = np.concatenate([total_input, input], axis=0)
+            total_target = np.concatenate([total_target, target], axis=0)
+        print(f'Performing linear regression with input shape {total_input.shape}')
+        print(f'\t and target shape: {total_target.shape}')
+        self.model.fit(total_input, total_target)
         self.model_trained = True
 
     def predict(self, x_input: np.array) -> np.array:
         """
         Uses the trained model to make a prediction based on x_input
-        :param x_input: single timestep with n_features X n_step_size
+        :param x_input: single timestep with n_step_size X n_features
         :return: Correctly timestamped pandas dataframe with the predicted
         value/s
         """
-        x = x_input.reshape(1, x_input.shape[0] * x_input.shape[1])
+        x = np.reshape(x_input, (1, -1))
+
         if self.model_trained:
             return self.model.predict(x)
         else:
