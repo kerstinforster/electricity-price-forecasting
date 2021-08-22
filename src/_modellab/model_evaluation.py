@@ -80,22 +80,22 @@ class ModelEvaluator(object):
 
         scores_dict = dict()
         if 'r2' in eval_metrics or 'all' in eval_metrics:
-            scores_dict["r2_score"] = self._calc_r2(y_pred, y_true)
+            scores_dict['r2_score'] = self._calc_r2(y_pred, y_true)
 
         if 'mae' in eval_metrics or 'all' in eval_metrics:
-            scores_dict["mae_score"] = self._calc_mae(y_pred, y_true)
+            scores_dict['mae_score'] = self._calc_mae(y_pred, y_true)
 
         if 'mse' in eval_metrics or 'all' in eval_metrics:
-            scores_dict["mse_score"] = self._calc_mse(y_pred, y_true)
+            scores_dict['mse_score'] = self._calc_mse(y_pred, y_true)
 
         if 'mape' in eval_metrics or 'all' in eval_metrics:
-            scores_dict["mape_score"] = self._calc_mape(y_pred, y_true)
+            scores_dict['mape_score'] = self._calc_mape(y_pred, y_true)
 
         if 'smape' in eval_metrics or 'all' in eval_metrics:
-            scores_dict["smape_score"] = self._calc_smape(y_pred, y_true)
+            scores_dict['smape_score'] = self._calc_smape(y_pred, y_true)
 
         if not scores_dict:
-            raise ValueError("Valid values for eval_metrics are: all, r2, mae, "
-                             "mse, mape or smape.")
+            raise ValueError('Valid values for eval_metrics are: all, r2, mae, '
+                             'mse, mape or smape.')
 
         return scores_dict
