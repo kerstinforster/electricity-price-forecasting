@@ -7,7 +7,7 @@ from src.data.data_transformer import DataTransformer
 from src.data.data_splitter import DataSplitter, train_test_split
 from src.models.linear_regression_model import LinearRegressionModel
 from src.models.sarimax_model import SARIMAXModel
-
+from src._modellab.model_evaluation import ModelEvaluator
 
 if __name__ == '__main__':
     # Create a dataset generator class
@@ -38,6 +38,11 @@ if __name__ == '__main__':
     prediction = model.predict(x_test[0, :, :])
     print(f'True value: {y_test[0, :]}')
     print(f'Pred value: {prediction}')
+
+    model_eval = ModelEvaluator()
+    print("Model performance metrics: ",
+          model_eval.evaluate(y_pred=prediction, y_true=y_test[0, :]))
+
 
     # Test SARIMAX model
     # sarimax = SARIMAXModel({'gap': 0, 'spot_index': 0})
