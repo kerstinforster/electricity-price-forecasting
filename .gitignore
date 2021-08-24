@@ -2,6 +2,7 @@
 html_coverage
 data/
 !src/data
+results
 
 # Pycharm
 .idea

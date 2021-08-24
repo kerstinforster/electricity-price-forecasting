@@ -40,7 +40,7 @@ class DataSplitter:
         y_data = y_data[:, self.window_size+self.gap:].reshape((-1,))
 
         dataset = tf.keras.preprocessing.timeseries_dataset_from_array(
-            data, y_data, sequence_length=7 * 24,
+            data, y_data, sequence_length=self.window_size,
             batch_size=self.batch_size,
             shuffle=self.shuffle,
         )

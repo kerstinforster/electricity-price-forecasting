@@ -1,6 +1,6 @@
-# This is an example on how to use this project's code base.
-
-import numpy as np
+""" This is an example script that shows how to use this project's code base.
+It shows our data collection and processing, and how to train some of
+our prediction models. """
 
 from src.data.dataset_generator import DatasetGenerator
 from src.data.data_transformer import DataTransformer
@@ -19,7 +19,6 @@ if __name__ == '__main__':
         'num_features': 19,
         'num_layers': 1,
         'hidden_layer_size': 512,
-        'shuffle': False
     }
 
     # Generate a dataset
@@ -62,7 +61,7 @@ if __name__ == '__main__':
     print(f'LSTM Model Scores: \n '
           f'{model_evaluator.evaluate(lstm_prediction, test_dataset)}')
 
-    # Revert the scaling of the prediction
+    # Revert the scaling of the prediction (to show how it works)
     print(f'Reverse-transformed Linear prediction: \n'
           f'{dt.reverse_transform_spot(linear_prediction[0])}')
     print(f'Reverse-transformed LSTM prediction: \n'

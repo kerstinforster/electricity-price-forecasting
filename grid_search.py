@@ -1,79 +1,45 @@
-import itertools
+"""
+This file shows an example grid search
+"""
 
-from src.model_evaluator import ModelEvaluator
-from src.models.model_factory import ModelFactory
 from src.data.dataset_generator import DatasetGenerator
-from src.data.data_splitter import DataSplitter, train_test_split
+from src.data.data_splitter import train_test_split
 from src.data.data_transformer import DataTransformer
-
-# we run one gridsearch over all our different models for each time horizon
-prediction_time_horizon = 1  # t+1, t+24, or t+168
-
-# define a parameter grid for each model
-sarimax_param_grid = {
-    "model_name": "sarimax",
-    "window_size": [12, 24, 72, 168]
-}
-
-prophet_param_grid = {
-    "model_name": "prophet"
-}
-
-lstm_param_grid = {
-    "model_name": "lstm"
-}
+from src.grid_searcher import GridSearcher
 
 
-# list of dicts containing the parameter grid for the every model
-all_model_param_grids = [sarimax_param_grid,
-                         prophet_param_grid,
-                         lstm_param_grid]
+if __name__ == '__main__':
+    # define a parameter grid for each model
+#    lstm_param_grid = {
+#        "model_name": ["lstm"],
+#        "window_size": [168],
+#        "gap": [0, 23, 167],  # Prediction horizons (hour, day, week)
+#        "num_layers": [1, 2],
+#        "hidden_layer_size": [128, 256]
+#    }
 
+    linear_param_grid = {
+        "model_name": ["linear_regression"],
+        "window_size": [12, 24, 72, 168]
+    }
 
-### CREATE TRAIN AND TEST SET ###
-dg = DatasetGenerator(['all'])
+    trivial_param_grid = {
+        "model_name": ["trivial"]  # Add trivial model as baseline
+    }
 
-# Get a dataset
-dataset = dg.get_dataset('2016-01-01', '2021-08-15', 'T23')
+    # list of dicts containing the parameter grid for the every model
+    all_model_param_grids = [linear_param_grid,
+                             trivial_param_grid]
 
-train, test = train_test_split(dataset, 0.1)
+    # CREATE TRAIN AND TEST DATASET #
+    dg = DatasetGenerator(['all'])
+    dataset = dg.get_dataset('2016-01-01', '2021-08-15', 'T23')
+    train, test = train_test_split(dataset, 0.1)
+    dt = DataTransformer()
+    train = dt.fit_transform(train)
+    test = dt.transform_data(test)
 
-# Create a data transformer for scaling data
-dt = DataTransformer()
-train = dt.fit_transform(train)
-test = dt.transform_data(test)
+    # Start the grid search
+    grid_search = GridSearcher(all_model_param_grids)
+    grid_search.run(train, test)
 
-# Create instance od ModelEvaluator for Model Ranking after training
-model_eval = ModelEvaluator()
-
-
-for model_param_grid in all_model_param_grids:
-
-    # TODO: generate single model configs from param grids
-    model_configs = itertools.product(model_param_grid)
-
-    for single_config in model_configs:
-        print(single_config)
-        continue
-
-        ### CREATE TRAIN AND TEST SET ACCORDING TO SPECIFIED n_look_back ###
-        splitter = DataSplitter(single_config["window_size"])  # n_look_back
-        n_gap = prediction_time_horizon - 1
-        x_train, y_train = splitter.split(train, n_gap)  # Gap 0, 23, 167 here
-        x_test, y_test = splitter.split(test, n_gap)
-
-        # Create and train the model with the specified config
-        model = ModelFactory.get(model_name=single_config["model_name"],
-                                 model_params=single_config)
-        model.train(x_train, y_train, single_config)
-
-        # Evaluate the trained model
-        y_pred = model.predict(x_input=x_test)
-        model_scores = model_eval.evaluate(y_pred, y_test, eval_metrics='all')
-
-        # TODO: create unique name from config for saving
-        model.save()  # saves model with current config in 'gs_trained_models'
-        save_model_ranking()  # saves model ranking as txt, pkl and also prints
-
-print_best_model_names()
-# at this point we could also retrain the best model/s on the training+test set if we still want to

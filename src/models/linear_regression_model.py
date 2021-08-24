@@ -53,9 +53,9 @@ class LinearRegressionModel(BaseModel):
             x = np.reshape(x, (x.shape[0], -1))
             total_input = np.concatenate([total_input, x], axis=0)
             total_target = np.concatenate([total_target, target], axis=0)
-        print(f'Performing linear regression with input shape '
-              f'{total_input.shape}')
-        print(f'\t and target shape: {total_target.shape}')
+        # print(f'Performing linear regression with input shape '
+        #       f'{total_input.shape}')
+        # print(f'\t and target shape: {total_target.shape}')
         self.model.fit(total_input, total_target)
         self.model_trained = True
 
