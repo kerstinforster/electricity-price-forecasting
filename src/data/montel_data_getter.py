@@ -43,9 +43,9 @@ class MontelDataGetter(BaseDataGetter):
                     'Please connect to the MWN via a VPN network! See '
                     'https://www.lrz.de/services/netz/mobil/vpn_en/ '
                     'for help.') from e
-            with open(file_path, 'w') as file:
+            with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(token)
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             self.token = file.readline()
         self._token_check()
 
@@ -125,10 +125,8 @@ class MontelDataGetter(BaseDataGetter):
                                  f'{len(element["TimeSpans"])} hours.')
 
             for index, value in enumerate(element['TimeSpans']):
-                data_point = dict()
-                data_point['Time'] = \
-                    f'{element["Date"]}T{index:02d}'
-                data_point['SPOTPrice'] = value['Value']
+                data_point = {'Time': f'{element["Date"]}T{index:02d}',
+                              'SPOTPrice': value['Value']}
                 processed_data.append(data_point)
 
         # Handle latest end date
@@ -136,10 +134,8 @@ class MontelDataGetter(BaseDataGetter):
             element = data_el[-1]
             element['Date'] = element['Date'][:10]
             for index, value in enumerate(element['TimeSpans']):
-                data_point = dict()
-                data_point['Time'] = \
-                    f'{element["Date"]}T{index:02d}'
-                data_point['SPOTPrice'] = value['Value']
+                data_point = {'Time': f'{element["Date"]}T{index:02d}',
+                              'SPOTPrice': value['Value']}
                 processed_data.append(data_point)
 
         # Quick sanity check here

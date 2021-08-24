@@ -86,14 +86,14 @@ class LinearRegressionModel(BaseModel):
         Saves the model at the given path with the given name
         :param path: path and model name at location where model should be saved
         """
-        if self.model_trained:
-            pkl.dump(self.model, open(
-                os.path.join(path, 'linear_regression.bin'), 'wb'))
-            pkl.dump(self.model_params, open(
-                os.path.join(path, 'model_params.bin'), 'wb'))
-        else:
+        if not self.model_trained:
             raise ValueError('The linear regression model should be trained '
                              'before it is saved.')
+        with open(os.path.join(path, 'linear_regression.bin'), 'wb') as file:
+            pkl.dump(self.model, file)
+        with open(os.path.join(path, 'model_params.bin'), 'wb') as file:
+            pkl.dump(self.model_params, file)
+
 
     def load(self, path: str):
         """
@@ -102,10 +102,10 @@ class LinearRegressionModel(BaseModel):
         loaded from
         """
         self.model_trained = True
-        self.model = pkl.load(open(
-            os.path.join(path, 'linear_regression.bin'), 'rb'))
-        self.model_params = pkl.load(open(
-            os.path.join(path, 'model_params.bin'), 'rb'))
+        with open(os.path.join(path, 'linear_regression.bin'), 'rb') as file:
+            self.model = pkl.load(file)
+        with open(os.path.join(path, 'model_params.bin'), 'rb') as file:
+            self.model_params = pkl.load(file)
         model_params = self.model_params
         self.window_size = model_params.get('window_size', 7 * 24)
         self.gap = model_params.get('gap', 0)

@@ -51,6 +51,7 @@ def test_model(model_name, datasets, gap):
 
     assert prediction.shape == (1756 - 12 - gap + 1,)
 
+    shutil.rmtree(f'data/test_models/{model_name}/', ignore_errors=True)
     os.makedirs(f'data/test_models/{model_name}/')
     model.save(f'data/test_models/{model_name}/')
 

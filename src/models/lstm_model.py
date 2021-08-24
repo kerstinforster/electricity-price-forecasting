@@ -96,8 +96,8 @@ class LSTMModel(BaseModel):
         :param path: path and model name at location where model should be saved
         """
         self.model.save(path)
-        pkl.dump(self.model_params, open(
-            os.path.join(path, 'model_params.bin'), 'wb'))
+        with open(os.path.join(path, 'model_params.bin'), 'wb') as file:
+            pkl.dump(self.model_params, file)
 
     def load(self, path: str):
         """
@@ -106,8 +106,8 @@ class LSTMModel(BaseModel):
         loaded from
         """
         self.model = tf.keras.models.load_model(path)
-        self.model_params = pkl.load(open(
-            os.path.join(path, 'model_params.bin'), 'rb'))
+        with open(os.path.join(path, 'model_params.bin'), 'rb') as file:
+            self.model_params = pkl.load(file)
         model_params = self.model_params
         self.hidden_layer_size = model_params.get('hidden_layer_size', 128)
         self.num_layers = model_params.get('num_layers', 1)

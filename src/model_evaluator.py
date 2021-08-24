@@ -91,7 +91,7 @@ class ModelEvaluator(object):
         if eval_metrics is None:
             eval_metrics = ['all']
 
-        scores_dict = dict()
+        scores_dict = {}
         if 'r2' in eval_metrics or 'all' in eval_metrics:
             scores_dict['r2_score'] = self._calc_r2(y_pred, y_true)
 

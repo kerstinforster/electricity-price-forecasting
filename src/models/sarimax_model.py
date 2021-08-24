@@ -12,13 +12,14 @@ class SARIMAXModel(BaseModel):
     Implementation of the SARIMAX model for prediction
     """
 
-    def __init__(self, model_params: dict):
+    def __init__(self, model_params: dict, name='sarimax'):
         """
-        Constructor for the SARIMAX model setting the name field and the
-        specific model parameters
-        :param name: name of the used algorithm
+        Constructor for the sarimax model setting the name field and
+        the specific model parameters
+        :param name: name of the used algorithm, 'sarimax'
+        :param model_params: Dictionary of parameters for the model
         """
-        super().__init__('sarimax', model_params)
+        super().__init__(name, model_params)
         assert 'gap' in model_params.keys()
         if model_params['gap'] == 0:
             self.p_param = (0, 2, 0)    # Values from grid search
@@ -31,43 +32,54 @@ class SARIMAXModel(BaseModel):
         self.training_data = None
         self.training_exog = None
 
-    def train(self, x_train: np.array, y_train: np.array, model_params: dict,
-              save_at: str = None) -> Any:
+    def train(self, dataset: Any, test_dataset: Any, model_params: dict) -> Any:
         """
-        Trains a model with the provided data (x_train, y_train)
-        :param x_train: np.array with (n_timesteps X n_features)
-        :param y_train: np.array with (n_timesteps X n_labels)
+        Trains the linear regression model with the provided data
+        :param dataset: Training dataset in format tf.data.Dataset
+            The dataset can be used as follows:
+            for batch in dataset:
+                x, y = batch
+            Shapes: x -> (batch_size, window_size, 19(num_features));
+                    y -> (batch_size,)
+        :param test_dataset: test dataset -> Can not be used for training,
+            only for printing test loss or similar
         :param model_params: dictionary which sets the relevant hyperparameters
-        :param save_at: saves model at given path with given name if not None
-        :return: nothing
+            for the training procedure
         """
         pass
 
-    def predict(self, x_input: np.array) -> np.array:
+    def predict(self, test_dataset: Any) -> np.array:
         """
-        Make a prediction using the SARIMAX model
-        :param x_input: single timestep with n_features X n_time_steps
-        :return: Correctly timestamped pandas dataframe with the predicted
-        value/s
+        Uses the trained model to make a prediction based on x_input
+        :param test_dataset: Training dataset in format tf.data.Dataset
+            The dataset can be used as follows:
+            for batch in dataset:
+                x, y = batch
+            Shapes: x -> (batch_size, window_size, 19(num_features));
+                    y -> (batch_size,)
+        :return: np.array containing all predictions, shape: (n_test,)
         """
-        spot_index = self.model_params.get('spot_index', 0)
-        self.model = SARIMAX(x_input[spot_index, :], order=self.p_param,
+        # TODO: This function is not working yet
+        data = None
+        self.model = SARIMAX(data, order=self.p_param,
                              seasonal_order=self.s_param)
         self.fit_model = self.model.fit()
-        prediction = self.fit_model.predict(
-            x_input.shape[1] + self.model_params['gap'])
+        prediction = self.fit_model.predict(test_dataset)
         return prediction
 
     def save(self, path: str):
         """
         Saves the model at the given path with the given name
-        :param path: path and model name in modelzoo
+        For this model, no saving is necessary
+        :param path: path and model name at location where model should be saved
         """
         pass
 
     def load(self, path: str):
         """
         Loads the model from the given path
-        :param path: path and model name in modelzoo
+        For this model, no loading is necessary
+        :param path: path and model name at location where model should be
+        loaded from
         """
         pass

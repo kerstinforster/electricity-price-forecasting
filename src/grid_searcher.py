@@ -47,7 +47,7 @@ class GridSearcher:
                         model_config, train_dataset, test_dataset)
                     self.results.append((model_config, scores))
                     bar()
-        with open(self.results_file_path, 'w') as file:
+        with open(self.results_file_path, 'w', encoding='utf-8') as file:
             json.dump(self.results, file)
 
     @staticmethod
