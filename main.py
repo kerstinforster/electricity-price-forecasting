@@ -7,7 +7,6 @@ from src.data.data_transformer import DataTransformer
 from src.data.data_splitter import DataSplitter, train_test_split
 from src.models.linear_regression_model import LinearRegressionModel
 from src.models.lstm_model import LSTMModel
-from src.models.sarimax_model import SARIMAXModel
 
 if __name__ == '__main__':
     model_config = {
@@ -41,7 +40,7 @@ if __name__ == '__main__':
     test_x = test.drop('Time', axis=1).values[:7*24, :]
     test_y = test.SPOTPrice.values[7*24]
 
-    # Train linear regression model model
+    # Train linear regression model
     model = LinearRegressionModel(model_config)
     model.train(train_dataset, test_dataset, {})
     linear_prediction = model.predict(test_x)
