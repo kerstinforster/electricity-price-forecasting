@@ -13,8 +13,7 @@ from src.data.data_splitter import DataSplitter, train_test_split
 def datasets():
     model_config = {
         'batch_size': 16,
-        'window_size': 7 * 24,
-        'gap': 0
+        'window_size': 12
     }
 
     dataset = DatasetGenerator().get_dataset('2020-01-01', '2020-12-31', 'T23')
@@ -34,7 +33,7 @@ def test_model(model_name, datasets, gap):
     train, test = datasets
     model_config = {
         'batch_size': 16,
-        'window_size': 7 * 24,
+        'window_size': 12,
         'gap': gap,
         'num_features': 19,
         'num_layers': 1,
@@ -50,7 +49,7 @@ def test_model(model_name, datasets, gap):
     model.train(train_dataset, test_dataset, model_config)
     prediction = model.predict(test_dataset)
 
-    assert prediction.shape == (1756 - 168 - gap + 1,)
+    assert prediction.shape == (1756 - 12 - gap + 1,)
 
     os.makedirs(f'data/test_models/{model_name}/')
     model.save(f'data/test_models/{model_name}/')

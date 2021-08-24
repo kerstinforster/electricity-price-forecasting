@@ -7,7 +7,7 @@ from src.data.data_transformer import DataTransformer
 
 
 def test_transforming():
-    dataset = DatasetGenerator().get_dataset('2018-01-01', '2019-01-01', 'T16')
+    dataset = DatasetGenerator().get_dataset('2018-08-01', '2019-01-01', 'T16')
     transformer = DataTransformer()
     transformed_data = transformer.fit_transform(dataset)
     assert transformed_data.equals(transformer.transform_data(dataset))
@@ -17,7 +17,7 @@ def test_transforming():
 
 
 def test_reverse_spot():
-    dataset = DatasetGenerator().get_dataset('2018-01-01', '2019-01-01', 'T16')
+    dataset = DatasetGenerator().get_dataset('2018-08-01', '2019-01-01', 'T16')
     transformer = DataTransformer()
     transformed_data = transformer.fit_transform(dataset)
     transformed_data2 = transformer.transform_data(dataset)
