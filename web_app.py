@@ -6,7 +6,7 @@ To start the frontend type "streamlit run web_app.py" in your terminal in the
 group03 repo
 """
 
-from src.data.montel_data_getter import MontelDataGetter
+from src.data.dataset_generator import DatasetGenerator
 from src.frontend.frontend_utils import *
 from src.frontend.frontend_graphs import GraphGenerator
 from src.frontend.frontend_elements import *
@@ -22,9 +22,9 @@ def request_montel_data() -> pd.DataFrame:
     :return: Dataframe with columns 'Time' and 'SPOTPrice'
     """
     # TODO: switch to end_date='latest' when merging
-    dg = MontelDataGetter()
-    current_date = get_current_time()[0]
-    return dg.get_data(end_date=current_date)
+    dg = DatasetGenerator(['montel'])
+    return dg.get_dataset(start_date='2016-01-01', end_date='latest',
+                          end_time='T23')
 
 
 def request_prediction(
