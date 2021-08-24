@@ -1,52 +1,68 @@
-# This is an example on how to use this project's code base.
-
-import pandas as pd
+""" This is an example script that shows how to use this project's code base.
+It shows our data collection and processing, and how to train some of
+our prediction models. """
 
 from src.data.dataset_generator import DatasetGenerator
 from src.data.data_transformer import DataTransformer
 from src.data.data_splitter import DataSplitter, train_test_split
 from src.models.linear_regression_model import LinearRegressionModel
-from src.models.sarimax_model import SARIMAXModel
+from src.models.lstm_model import LSTMModel
+from src.models.trivial_model import TrivialModel
+from src.model_evaluator import ModelEvaluator
 
 
 if __name__ == '__main__':
-    # Create a dataset generator class
-    dg = DatasetGenerator(['all'])
+    model_config = {
+        'batch_size': 64,
+        'window_size': 7*24,
+        'gap': 0,
+        'num_features': 19,
+        'num_layers': 1,
+        'hidden_layer_size': 512,
+    }
 
-    # Get a dataset
+    # Generate a dataset
+    dg = DatasetGenerator(['all'])
     dataset = dg.get_dataset('2016-01-01', '2021-08-15', 'T23')
 
+    # Split the dataset into train and test datasets
     train, test = train_test_split(dataset, 0.2)
 
-    # Create a data transformer for scaling data
+    # Normalize the data
     dt = DataTransformer()
     train = dt.fit_transform(train)
     test = dt.transform_data(test)
 
-    # Split for training
-    splitter = DataSplitter(7 * 24)  # One week training window size
-    x_train, y_train = splitter.split(train, 0)  # Gap 0, 23, 167 here
-    x_test, y_test = splitter.split(test, 0)
-    print(f'X_Train: {x_train.shape}')
-    print(f'Y_Train: {y_train.shape}')
-    print(f'X_Test: {x_test.shape}')
-    print(f'Y_Test: {y_test.shape}')
+    # Create final training and testing datasets (batches and windows)
+    splitter = DataSplitter(model_config)
+    train_dataset = splitter.split(train)
+    test_dataset = splitter.split(test)
 
-    # Train linear regression model model
-    model = LinearRegressionModel({})
-    model.train(x_train, y_train, {})
-    prediction = model.predict(x_test[0, :, :])
-    print(f'True value: {y_test[0, :]}')
-    print(f'Pred value: {prediction}')
+    model = TrivialModel(model_config)
+    model.train(train_dataset, test_dataset, {})
+    trivial_prediction = model.predict(test_dataset)
+    model_evaluator = ModelEvaluator()
+    print(f'Trivial Model Scores: \n '
+          f'{model_evaluator.evaluate(trivial_prediction, test_dataset)}')
 
-    # Test SARIMAX model
-    # sarimax = SARIMAXModel({'gap': 0, 'spot_index': 0})
-    # sarimax_data = train[30000:].append(test[:7*24]).drop(
-    #     'Time', axis=1).T.values
-    # print(f'SARIMAX Shape: {sarimax_data.shape}')
-    # sarimax_pred = sarimax.predict(sarimax_data)
-    # print(f'SARIMAX Pred value: {sarimax_pred}')
+    # Train linear regression model
+    model = LinearRegressionModel(model_config)
+    model.train(train_dataset, test_dataset, {})
+    linear_prediction = model.predict(test_dataset)
+    model_evaluator = ModelEvaluator()
+    print(f'Linear Regression Model Scores: \n '
+          f'{model_evaluator.evaluate(linear_prediction, test_dataset)}')
 
-    # Revert the scaling of the prediction
-    print(f'Reverse-transformed prediction: \n'
-          f'{dt.reverse_transform_spot(prediction)}')
+    # Train LSTM model
+    model = LSTMModel(model_config)
+    model.train(train_dataset, test_dataset, {'epochs': 10})
+    lstm_prediction = model.predict(test_dataset)
+    model_evaluator = ModelEvaluator()
+    print(f'LSTM Model Scores: \n '
+          f'{model_evaluator.evaluate(lstm_prediction, test_dataset)}')
+
+    # Revert the scaling of the prediction (to show how it works)
+    print(f'Reverse-transformed Linear prediction: \n'
+          f'{dt.reverse_transform_spot(linear_prediction[0])}')
+    print(f'Reverse-transformed LSTM prediction: \n'
+          f'{dt.reverse_transform_spot(lstm_prediction[0])}')

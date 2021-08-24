@@ -3,6 +3,7 @@ which are ready to be used for our models"""
 
 import pandas as pd
 import numpy as np
+import tensorflow as tf
 
 
 class DataSplitter:
@@ -10,10 +11,18 @@ class DataSplitter:
     This class splits the preprocessed dataframe into training and testing
     samples. First, the dataframe
     """
-    def __init__(self, window_size: int):
-        self.window_size = window_size
+    def __init__(self, params: dict):
+        """
+        Initialize the data splitter with the required data
+        :param params: Parameter dictionary
+        """
+        self.window_size = params.get('window_size', 7*24)
+        self.batch_size = params.get('batch_size', 64)
+        self.gap = params.get('gap', 0)
+        self.shuffle = params.get('shuffle', False)
+        # Shuffle True seems to break stuff
 
-    def split(self, data: pd.DataFrame, gap: int):
+    def split(self, data: pd.DataFrame) -> tf.data.Dataset:
         """
         Splitting the dataset with a sliding window evaluation method
         As a queue the training set and validation value are moving on
@@ -24,21 +33,19 @@ class DataSplitter:
 
         :param data: Dataframe of dimensions (N_Timesteps, N_Features)
         :param gap: skipped values between training and validation set
-        :return X_split: np.array (n_samples X n_features X window_length)
-        :return: Y_split: np.array (n_samples X n_features)
+        :return dataset:
         """
         data = data.drop(['Time'], axis=1)
-        x_data = data.T.to_numpy()
         y_data = np.expand_dims(data.SPOTPrice.to_numpy(), 0)
-        x = []
-        y = []
-        for i in range(x_data.shape[1] - self.window_size - gap):
-            x.append(x_data[:, i:self.window_size + i])
-            y.append(y_data[:, i+self.window_size+gap:i+self.window_size+gap+1])
-        x_split = np.concatenate([x], axis=0)
-        y_split = np.concatenate([y], axis=0)
+        y_data = y_data[:, self.window_size+self.gap:].reshape((-1,))
 
-        return x_split, y_split[:, :, 0]
+        dataset = tf.keras.preprocessing.timeseries_dataset_from_array(
+            data, y_data, sequence_length=self.window_size,
+            batch_size=self.batch_size,
+            shuffle=self.shuffle,
+        )
+
+        return dataset
 
 
 def train_test_split(data: pd.DataFrame, test_size: float = 0.2):

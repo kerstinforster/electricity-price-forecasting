@@ -66,6 +66,6 @@ class DataTransformer:
         :return: Array of reverse transformed SPOT Price values
         """
         if not len(data.shape) == 2:
-            data = np.expand_dims(data, 1)
+            data = np.reshape(data, (-1, 1))
         return self.spot_scaler.inverse_transform(data)
 

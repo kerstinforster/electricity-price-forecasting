@@ -1,38 +1,28 @@
-""" This file implements the SARIMAX model."""
+""" This class implements a trivial model that always chooses the last
+ known value as prediction """
 
-from typing import Any
 import numpy as np
-from statsmodels.tsa.statespace.sarimax import SARIMAX
+from typing import Any
 
 from src.models.model_interface import BaseModel
 
 
-class SARIMAXModel(BaseModel):
+class TrivialModel(BaseModel):
     """
-    Implementation of the SARIMAX model for prediction
+    This class implements a trivial baseline model
+    for the electricity price prediction task
     """
 
-    def __init__(self, model_params: dict, name='sarimax'):
+    def __init__(self, model_params: dict, name: str = 'trivial'):
         """
-        Constructor for the sarimax model setting the name field and
+        Constructor for the trivial model setting the name field and
         the specific model parameters
-        :param name: name of the used algorithm, 'sarimax'
+        :param name: name of the used algorithm, 'trivial'
         :param model_params: Dictionary of parameters for the model
         """
         super().__init__(name, model_params)
-        assert 'gap' in model_params.keys()
-        if model_params['gap'] == 0:
-            self.p_param = (0, 2, 0)    # Values from grid search
-            self.s_param = (0, 2, 0, 24)
-        else:
-            self.p_param = (2, 1, 1)
-            self.s_param = (2, 1, 1, 24)
-        self.model = None
-        self.fit_model = None
-        self.training_data = None
-        self.training_exog = None
 
-    def train(self, dataset: Any, test_dataset: Any, model_params: dict) -> Any:
+    def train(self, dataset: Any, test_dataset: Any, model_params: dict) -> Any:  # pylint: disable=unused-argument
         """
         Trains the linear regression model with the provided data
         :param dataset: Training dataset in format tf.data.Dataset
@@ -46,6 +36,7 @@ class SARIMAXModel(BaseModel):
         :param model_params: dictionary which sets the relevant hyperparameters
             for the training procedure
         """
+        # For this trivial model, training is not necessary
         pass
 
     def predict(self, test_dataset: Any) -> np.array:
@@ -59,13 +50,13 @@ class SARIMAXModel(BaseModel):
                     y -> (batch_size,)
         :return: np.array containing all predictions, shape: (n_test,)
         """
-        # TODO: This function is not working yet
-        data = None
-        self.model = SARIMAX(data, order=self.p_param,
-                             seasonal_order=self.s_param)
-        self.fit_model = self.model.fit()
-        prediction = self.fit_model.predict(test_dataset)
-        return prediction
+        prediction = np.empty(shape=(0, 1))
+        for batch in test_dataset:
+            x, _ = batch
+            pred = np.asarray(x)[:, -1, 0].reshape((-1, 1))
+            prediction = np.concatenate([prediction, pred], axis=0)
+
+        return prediction.reshape((-1,))
 
     def save(self, path: str):
         """

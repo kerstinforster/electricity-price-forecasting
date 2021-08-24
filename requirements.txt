@@ -13,3 +13,5 @@ geopy
 jupyter
 numpy
 statsmodels
+tensorflow
+alive-progress
