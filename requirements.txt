@@ -13,3 +13,4 @@ geopy
 jupyter
 numpy
 statsmodels
+tensorflow
