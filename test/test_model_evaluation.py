@@ -8,7 +8,7 @@ def test_calc_r2():
     y_pred = np.array([1, 2, 3, 4, 5])
     y_true = np.array([2, 3, 4, 5, 6])
 
-    r2_score = ModelEvaluator._calc_r2(y_pred, y_true)
+    r2_score = ModelEvaluator._calc_r2(y_pred, y_true)  # pylint: disable=protected-access
     assert r2_score == 0.5
 
 
@@ -16,7 +16,7 @@ def test_calc_mae():
     y_pred = np.array([1, 2, 3, 4, 5])
     y_true = np.array([2, 3, 4, 5, 6])
 
-    mae_score = ModelEvaluator._calc_mae(y_pred, y_true)
+    mae_score = ModelEvaluator._calc_mae(y_pred, y_true)  # pylint: disable=protected-access
     assert mae_score == 1.0
 
 
@@ -24,7 +24,7 @@ def test_calc_mse():
     y_pred = np.array([1, 2, 3, 4, 5])
     y_true = np.array([2, 3, 4, 5, 6])
 
-    mse_score = ModelEvaluator._calc_mse(y_pred, y_true)
+    mse_score = ModelEvaluator._calc_mse(y_pred, y_true)  # pylint: disable=protected-access
     assert mse_score == 1.0
 
 
@@ -32,7 +32,7 @@ def test_calc_mape():
     y_pred = np.array([1, 2, 3, 4, 5])
     y_true = np.array([2, 3, 4, 5, 6])
 
-    mape_score = ModelEvaluator._calc_mape(y_pred, y_true)
+    mape_score = ModelEvaluator._calc_mape(y_pred, y_true)  # pylint: disable=protected-access
     assert np.isclose(mape_score, 0.45666666666666667)
 
 
@@ -40,7 +40,7 @@ def test_calc_smape():
     y_pred = np.array([1, 2, 3, 4, 5])
     y_true = np.array([2, 3, 4, 5, 6])
 
-    smape_score = ModelEvaluator._calc_smape(y_pred, y_true)
+    smape_score = ModelEvaluator._calc_smape(y_pred, y_true)  # pylint: disable=protected-access
     assert np.isclose(smape_score, 35.128427128427134)
 
 

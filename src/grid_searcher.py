@@ -13,6 +13,10 @@ from src.models.model_factory import ModelFactory
 
 
 class GridSearcher:
+    """
+    Grid Searcher class that implements an experiment grid search
+    """
+
     def __init__(self, parameter_grids: list):
         """
         Initialize the grid search class
@@ -37,13 +41,13 @@ class GridSearcher:
             configs = self.get_all_combinations(model_grid)
             with alive_bar(len(configs),
                            title=f'Model {model_grid["model_name"]}',
-                           force_tty=1, theme="smooth") as bar:
+                           force_tty=1, theme='smooth') as bar:
                 for model_config in configs:
                     scores = self.train_model_config(
                         model_config, train_dataset, test_dataset)
                     self.results.append((model_config, scores))
                     bar()
-        with open(self.results_file_path, "w") as file:
+        with open(self.results_file_path, 'w') as file:
             json.dump(self.results, file)
 
     @staticmethod
