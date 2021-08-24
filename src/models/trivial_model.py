@@ -50,7 +50,7 @@ class TrivialModel(BaseModel):
                     y -> (batch_size,)
         :return: np.array containing all predictions, shape: (n_test,)
         """
-        prediction = np.empty(shape=(1, 1))
+        prediction = np.empty(shape=(0, 1))
         for batch in test_dataset:
             x, _ = batch
             pred = np.asarray(x)[:, -1, 0].reshape((-1, 1))

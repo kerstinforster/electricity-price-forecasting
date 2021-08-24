@@ -70,7 +70,7 @@ class LinearRegressionModel(BaseModel):
                     y -> (batch_size,)
         :return: np.array containing all predictions, shape: (n_test,)
         """
-        total_input = np.empty(shape=(1, self.window_size * self.n_features))
+        total_input = np.empty(shape=(0, self.window_size * self.n_features))
         for batch in test_dataset:
             x, _ = batch
             x = np.reshape(x, (x.shape[0], -1))

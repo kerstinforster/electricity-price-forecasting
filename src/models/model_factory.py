@@ -1,8 +1,8 @@
 """ This class implements a factory for models"""
 
-from linear_regression_model import LinearRegressionModel
-from lstm_model import LSTMModel
-from trivial_model import TrivialModel
+from src.models.linear_regression_model import LinearRegressionModel
+from src.models.lstm_model import LSTMModel
+from src.models.trivial_model import TrivialModel
 
 
 class ModelFactory:
