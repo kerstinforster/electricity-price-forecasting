@@ -1,5 +1,10 @@
-from src._modellab.model_evaluation import ModelEvaluator
+import itertools
+
+from src.model_evaluator import ModelEvaluator
 from src.models.model_factory import ModelFactory
+from src.data.dataset_generator import DatasetGenerator
+from src.data.data_splitter import DataSplitter, train_test_split
+from src.data.data_transformer import DataTransformer
 
 # we run one gridsearch over all our different models for each time horizon
 prediction_time_horizon = 1  # t+1, t+24, or t+168
@@ -7,9 +12,7 @@ prediction_time_horizon = 1  # t+1, t+24, or t+168
 # define a parameter grid for each model
 sarimax_param_grid = {
     "model_name": "sarimax",
-    "n_look_back": [12, 24, 72, 168],  #
-    "param_2": [1, 2, 3, 4, 5],
-    "param_3": [1, 2, 3, 4, 5]
+    "window_size": [12, 24, 72, 168]
 }
 
 prophet_param_grid = {
@@ -47,12 +50,14 @@ model_eval = ModelEvaluator()
 for model_param_grid in all_model_param_grids:
 
     # TODO: generate single model configs from param grids
-    model_configs =
+    model_configs = itertools.product(model_param_grid)
 
     for single_config in model_configs:
+        print(single_config)
+        continue
 
         ### CREATE TRAIN AND TEST SET ACCORDING TO SPECIFIED n_look_back ###
-        splitter = DataSplitter(single_config["n_look_back"])  # n_look_back
+        splitter = DataSplitter(single_config["window_size"])  # n_look_back
         n_gap = prediction_time_horizon - 1
         x_train, y_train = splitter.split(train, n_gap)  # Gap 0, 23, 167 here
         x_test, y_test = splitter.split(test, n_gap)

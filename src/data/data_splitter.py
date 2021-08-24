@@ -19,8 +19,10 @@ class DataSplitter:
         self.window_size = params.get('window_size', 7*24)
         self.batch_size = params.get('batch_size', 64)
         self.gap = params.get('gap', 0)
+        self.shuffle = params.get('shuffle', False)
+        # Shuffle True seems to break stuff
 
-    def split(self, data: pd.DataFrame):
+    def split(self, data: pd.DataFrame) -> tf.data.Dataset:
         """
         Splitting the dataset with a sliding window evaluation method
         As a queue the training set and validation value are moving on
@@ -40,7 +42,7 @@ class DataSplitter:
         dataset = tf.keras.preprocessing.timeseries_dataset_from_array(
             data, y_data, sequence_length=7 * 24,
             batch_size=self.batch_size,
-            shuffle=True,
+            shuffle=self.shuffle,
         )
 
         return dataset

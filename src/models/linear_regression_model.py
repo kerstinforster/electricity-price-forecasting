@@ -1,6 +1,7 @@
 """ This class implements a linear regression model that predicts """
 
 import numpy as np
+import os
 import pickle as pkl
 from typing import Any
 from sklearn.linear_model import LinearRegression
@@ -16,7 +17,10 @@ class LinearRegressionModel(BaseModel):
 
     def __init__(self, model_params: dict, name: str = 'linear_regression'):
         """
-        Constructor for the linear regression example/baseline model
+        Constructor for the linear regression model setting the name field and
+        the specific model parameters
+        :param name: name of the used algorithm, 'linear_regression'
+        :param model_params: Dictionary of parameters for the model
         """
         super().__init__(name, model_params)
         self.model = LinearRegression(n_jobs=-1)
@@ -25,40 +29,54 @@ class LinearRegressionModel(BaseModel):
         self.n_features = model_params.get('num_features', 19)
         self.batch_size = model_params.get('batch_size', 64)
 
-    def train(self, dataset: Any, test_dataset: Any, model_params: dict,  # pylint: disable=unused-argument
-              save_at: str = None) -> Any:                                # pylint: disable=unused-argument
+    def train(self, dataset: Any, test_dataset: Any, model_params: dict) -> Any:  # pylint: disable=unused-argument
         """
-        Trains a model with the provided data (x_train, y_train)
-        :param dataset: np.array with (n_samples X n_features X window_length)
-        :param test_dataset: np.array with (n_samples X n_labels)
+        Trains the linear regression model with the provided data
+        :param dataset: Training dataset in format tf.data.Dataset
+            The dataset can be used as follows:
+            for batch in dataset:
+                x, y = batch
+            Shapes: x -> (batch_size, window_size, 19(num_features));
+                    y -> (batch_size,)
+        :param test_dataset: test dataset -> Can not be used for training,
+            only for printing test loss or similar
         :param model_params: dictionary which sets the relevant hyperparameters
-        :param save_at: saves model at given path with given name if not None
-        :return: trained instance of the model
+            for the training procedure
         """
-        # Input for linear regression is (n_samples, n_features) dimensional
-        total_input = np.empty(shape=(1, self.window_size * self.n_features))
-        total_target = np.empty(shape=(1))
+        # For linear regression, the tf.data.Dataset is not directly usable.
+        # Input for linear regression is (n_samples, n_features) dimensional.
+        # This means we must extract all the data from the dataset into an array
+        total_input = np.empty(shape=(0, self.window_size * self.n_features))
+        total_target = np.empty(shape=(0,))
         for batch in dataset:
-            input, target = batch
-            input = np.reshape(input, (input.shape[0], -1))
-            total_input = np.concatenate([total_input, input], axis=0)
+            x, target = batch
+            x = np.reshape(x, (x.shape[0], -1))
+            total_input = np.concatenate([total_input, x], axis=0)
             total_target = np.concatenate([total_target, target], axis=0)
-        print(f'Performing linear regression with input shape {total_input.shape}')
+        print(f'Performing linear regression with input shape '
+              f'{total_input.shape}')
         print(f'\t and target shape: {total_target.shape}')
         self.model.fit(total_input, total_target)
         self.model_trained = True
 
-    def predict(self, x_input: np.array) -> np.array:
+    def predict(self, test_dataset: Any) -> np.array:
         """
         Uses the trained model to make a prediction based on x_input
-        :param x_input: single timestep with n_step_size X n_features
-        :return: Correctly timestamped pandas dataframe with the predicted
-        value/s
+        :param test_dataset: Training dataset in format tf.data.Dataset
+            The dataset can be used as follows:
+            for batch in dataset:
+                x, y = batch
+            Shapes: x -> (batch_size, window_size, 19(num_features));
+                    y -> (batch_size,)
+        :return: np.array containing all predictions, shape: (n_test,)
         """
-        x = np.reshape(x_input, (1, -1))
-
+        total_input = np.empty(shape=(1, self.window_size * self.n_features))
+        for batch in test_dataset:
+            x, _ = batch
+            x = np.reshape(x, (x.shape[0], -1))
+            total_input = np.concatenate([total_input, x], axis=0)
         if self.model_trained:
-            return self.model.predict(x)
+            return self.model.predict(total_input).reshape((-1,))
         else:
             raise ValueError('Linear Regression model has to be trained or '
                              'loaded before predictions can be made.')
@@ -69,8 +87,10 @@ class LinearRegressionModel(BaseModel):
         :param path: path and model name at location where model should be saved
         """
         if self.model_trained:
-            # TODO: fix path to modelzoo here
-            pkl.dump(self.model, path)
+            pkl.dump(self.model, open(
+                os.path.join(path, 'linear_regression.bin'), 'wb'))
+            pkl.dump(self.model_params, open(
+                os.path.join(path, 'model_params.bin'), 'wb'))
         else:
             raise ValueError('The linear regression model should be trained '
                              'before it is saved.')
@@ -82,5 +102,12 @@ class LinearRegressionModel(BaseModel):
         loaded from
         """
         self.model_trained = True
-        # TODO: fix path to modelzoo here
-        self.model = pkl.load(path)
+        self.model = pkl.load(open(
+            os.path.join(path, 'linear_regression.bin'), 'rb'))
+        self.model_params = pkl.load(open(
+            os.path.join(path, 'model_params.bin'), 'rb'))
+        model_params = self.model_params
+        self.window_size = model_params.get('window_size', 7 * 24)
+        self.gap = model_params.get('gap', 0)
+        self.n_features = model_params.get('num_features', 19)
+        self.batch_size = model_params.get('batch_size', 64)

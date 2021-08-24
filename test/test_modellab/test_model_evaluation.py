@@ -1,8 +1,7 @@
 """ Validate that the model evaluation functions work as expected """
 
-import pytest
 import numpy as np
-from src._modellab.model_evaluation import ModelEvaluator
+from src.model_evaluator import ModelEvaluator
 
 
 def test_calc_r2():
@@ -50,7 +49,7 @@ def test_evaluate():
     y_true = np.array([2, 3, 4, 5, 6])
 
     model_eval = ModelEvaluator()
-    scores = model_eval.evaluate(y_pred, y_true, ['all'])
+    scores = model_eval.evaluate(y_pred, [(y_true, y_true)], ['all'])
     scores = np.array(list(scores.values()))
     test_scores = np.array([0.5, 1.0, 1.0, 0.45666666666666667,
                             35.128427128427134])

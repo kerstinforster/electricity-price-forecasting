@@ -3,6 +3,8 @@
 import numpy as np
 from typing import Any
 import tensorflow as tf
+import os
+import pickle as pkl
 
 from src.models.model_interface import BaseModel
 
@@ -15,7 +17,10 @@ class LSTMModel(BaseModel):
 
     def __init__(self, model_params: dict, name: str = 'lstm'):
         """
-        Constructor for the linear regression example/baseline model
+        Constructor for the lstm model setting the name field and the
+        specific model parameters
+        :param name: name of the used algorithm, 'lstm'
+        :param model_params: Dictionary of parameters for the model
         """
         super().__init__(name, model_params)
         self.hidden_layer_size = model_params.get('hidden_layer_size', 128)
@@ -43,15 +48,19 @@ class LSTMModel(BaseModel):
 
         self.history = None
 
-    def train(self, x_train, y_train, model_params: dict,  # pylint: disable=unused-argument
-              save_at: str = None) -> Any:                 # pylint: disable=unused-argument
+    def train(self, dataset: Any, test_dataset: Any, model_params: dict) -> Any:  # pylint: disable=unused-argument
         """
-        Trains a model with the provided data (x_train, y_train)
-        :param x_train: np.array with (n_samples X n_features X window_length)
-        :param y_train: np.array with (n_samples X n_labels)
+        Trains the model with the provided data
+        :param dataset: Training dataset in format tf.data.Dataset
+            The dataset can be used as follows:
+            for batch in dataset:
+                x, y = batch
+            Shapes: x -> (batch_size, window_size, 19(num_features));
+                    y -> (batch_size,)
+        :param test_dataset: test dataset -> Can not be used for training,
+            only for printing test loss or similar
         :param model_params: dictionary which sets the relevant hyperparameters
-        :param save_at: saves model at given path with given name if not None
-        :return: trained instance of the model
+            for the training procedure
         """
         epochs = model_params.get('epochs', 100)
 
@@ -63,27 +72,32 @@ class LSTMModel(BaseModel):
                            optimizer=tf.optimizers.Adam(),
                            metrics=[tf.metrics.MeanAbsoluteError()])
 
-        self.history = self.model.fit(x_train, epochs=epochs,
-                                      validation_data=y_train,
+        self.history = self.model.fit(dataset, epochs=epochs,
+                                      validation_data=test_dataset,
                                       callbacks=[early_stopping])
 
-    def predict(self, x_input: np.array) -> np.array:
+    def predict(self, test_dataset: Any) -> np.array:
         """
         Uses the trained model to make a prediction based on x_input
-        :param x_input: single timestep with n_step_size X n_features
-        :return: Correctly timestamped pandas dataframe with the predicted
-        value/s
+        :param test_dataset: Training dataset in format tf.data.Dataset
+            The dataset can be used as follows:
+            for batch in dataset:
+                x, y = batch
+            Shapes: x -> (batch_size, window_size, 19(num_features));
+                    y -> (batch_size,)
+        :return: np.array containing all predictions, shape: (n_test,)
         """
-        x_input = np.expand_dims(x_input, 0)
-        prediction = self.model.predict(x_input)
-        return prediction
+        prediction = self.model.predict(test_dataset)
+        return prediction.reshape((-1,))
 
     def save(self, path: str):
         """
         Saves the model at the given path with the given name
         :param path: path and model name at location where model should be saved
         """
-        pass
+        self.model.save(path)
+        pkl.dump(self.model_params, open(
+            os.path.join(path, 'model_params.bin'), 'wb'))
 
     def load(self, path: str):
         """
@@ -91,4 +105,12 @@ class LSTMModel(BaseModel):
         :param path: path and model name at location where model should be
         loaded from
         """
-        pass
+        self.model = tf.keras.models.load_model(path)
+        self.model_params = pkl.load(open(
+            os.path.join(path, 'model_params.bin'), 'rb'))
+        model_params = self.model_params
+        self.hidden_layer_size = model_params.get('hidden_layer_size', 128)
+        self.num_layers = model_params.get('num_layers', 1)
+        self.input_size = model_params.get('num_features', 19)
+        self.batch_size = model_params.get('batch_size', 64)
+        self.window_size = model_params.get('window_size', 7 * 24)

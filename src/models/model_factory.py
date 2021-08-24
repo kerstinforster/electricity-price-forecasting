@@ -1,6 +1,8 @@
 """ This class implements a factory for models"""
 
 from linear_regression_model import LinearRegressionModel
+from lstm_model import LSTMModel
+from trivial_model import TrivialModel
 
 
 class ModelFactory:
@@ -21,11 +23,11 @@ class ModelFactory:
         if model_name == 'linear_regression':
             return LinearRegressionModel(model_params)
 
-        elif model_name == 'prophet':
-            pass
+        elif model_name == 'lstm':
+            return LSTMModel(model_params)
 
-        elif model_name == 'rcnn':
-            pass
+        elif model_name == 'trivial':
+            return TrivialModel(model_params)
 
         else:
             raise ValueError(f'The model with the name "{model_name}" '
