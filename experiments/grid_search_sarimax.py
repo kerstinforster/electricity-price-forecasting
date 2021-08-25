@@ -9,19 +9,11 @@ from src.grid_searcher import GridSearcher
 
 
 if __name__ == '__main__':
-    # define a parameter grid for each model
-    lstm_param_grid = {
-        'model_name': ['lstm'],
+    # define a parameter grid for the SARIMAX model
+    sarimax_param_grid = {
+        'model_name': ['sarimax'],
         'window_size': [168],
         'gap': [0, 23, 167],  # Prediction horizons (hour, day, week)
-        'num_layers': [1],
-        'hidden_layer_size': [128],
-        'epochs': [10]
-    }
-
-    linear_param_grid = {
-        'model_name': ['linear_regression'],
-        'window_size': [12, 24, 72, 168]
     }
 
     trivial_param_grid = {
@@ -29,8 +21,7 @@ if __name__ == '__main__':
     }
 
     # list of dicts containing the parameter grid for the every model
-    all_model_param_grids = [lstm_param_grid,
-                             linear_param_grid,
+    all_model_param_grids = [sarimax_param_grid,
                              trivial_param_grid]
 
     # CREATE TRAIN AND TEST DATASET #
