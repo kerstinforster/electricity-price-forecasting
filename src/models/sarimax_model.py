@@ -22,15 +22,16 @@ class SARIMAXModel(BaseModel):
         super().__init__(name, model_params)
         assert 'gap' in model_params.keys()
         if model_params['gap'] == 0:
-            self.p_param = (0, 2, 0)    # Values from grid search
-            self.s_param = (0, 2, 0, 24)
+            self.p_param = (1, 0, 0)    # Values from grid search
+            self.s_param = (1, 0, 0, 24)
         else:
-            self.p_param = (2, 1, 1)
-            self.s_param = (2, 1, 1, 24)
+            self.p_param = (2, 0, 1)
+            self.s_param = (2, 0, 1, 24)
         self.model = None
         self.fit_model = None
         self.training_data = None
         self.training_exog = None
+        self.gap = model_params['gap']
 
     def train(self, dataset: Any, test_dataset: Any, model_params: dict) -> Any:
         """
@@ -59,12 +60,13 @@ class SARIMAXModel(BaseModel):
                     y -> (batch_size,)
         :return: np.array containing all predictions, shape: (n_test,)
         """
-        # TODO: This function is not working yet
-        data = None
+
+        data = test_dataset.SPOTPrice[:-168]
         self.model = SARIMAX(data, order=self.p_param,
                              seasonal_order=self.s_param)
-        self.fit_model = self.model.fit()
-        prediction = self.fit_model.predict(test_dataset)
+        self.fit_model = self.model.fit(method='powell', disp=False)
+        print(self.gap)
+        prediction = self.fit_model.predict(len(data)+self.gap, len(data)+self.gap)
         return prediction
 
     def save(self, path: str):

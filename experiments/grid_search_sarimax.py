@@ -14,6 +14,7 @@ if __name__ == '__main__':
         'model_name': ['sarimax'],
         'window_size': [168],
         'gap': [0, 23, 167],  # Prediction horizons (hour, day, week)
+        # 'param': [range(0, 3)]
     }
 
     trivial_param_grid = {
