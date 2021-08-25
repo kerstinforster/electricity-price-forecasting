@@ -1,5 +1,5 @@
 """
-This file shows an example grid search
+This file shows an example grid search for the lstm model
 """
 
 from src.data.dataset_generator import DatasetGenerator
