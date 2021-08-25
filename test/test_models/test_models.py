@@ -27,7 +27,8 @@ def datasets():
     return train, test
 
 
-@pytest.mark.parametrize('model_name', ['lstm', 'linear_regression', 'trivial'])
+@pytest.mark.parametrize('model_name', ['lstm', 'linear_regression', 'trivial',
+                                        'prophet'])
 @pytest.mark.parametrize('gap', [0, 23, 167])
 def test_model(model_name, datasets, gap):
     train, test = datasets
