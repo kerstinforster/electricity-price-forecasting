@@ -13,7 +13,7 @@ if __name__ == '__main__':
     linear_param_grid = {
         'model_name': ['linear'],
         'window_size': [168],
-        'gap': [0, 23, 167],  # Prediction horizons (hour, day, week)
+        'gap': [0]#, 23, 167],  # Prediction horizons (hour, day, week)
     }
 
     linear_regression_param_grid = {

@@ -20,6 +20,7 @@ class LinearModel(BaseModel):
         :param model_params: Dictionary of parameters for the model
         """
         super().__init__(name, model_params)
+        self.gap = model_params.get('gap', 0)
 
     def train(self, dataset: Any, test_dataset: Any, model_params: dict) -> Any:  # pylint: disable=unused-argument
         """
@@ -35,8 +36,6 @@ class LinearModel(BaseModel):
         :param model_params: dictionary which sets the relevant hyperparameters
             for the training procedure
         """
-        # For this trivial model, training is not necessary
-        pass
 
     def predict(self, test_dataset: Any) -> np.array:
         """
@@ -49,8 +48,16 @@ class LinearModel(BaseModel):
                     y -> (batch_size,)
         :return: np.array containing all predictions, shape: (n_test,)
         """
-        pass
+        prediction = np.empty(shape=(0, 1))
+        for batch in test_dataset:
+            x, _ = batch
+            spot_weekago = np.asarray(x)[:, -169, 0].reshape((-1, 1))
+            spot_weekagonext = np.asarray(x)[:, -169+self.gap+1, 0].reshape((-1, 1))
+            spot_diff_weekago = spot_weekagonext - spot_weekago
+            pred = np.asarray(x)[:, -1, 0].reshape((-1, 1)) + spot_diff_weekago
+            prediction = np.concatenate([prediction, pred], axis=0)
 
+        return prediction.reshape((-1,))
     def save(self, path: str):
         """
         Saves the model at the given path with the given name
