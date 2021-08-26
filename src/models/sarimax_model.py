@@ -2,9 +2,12 @@
 
 from typing import Any
 import numpy as np
+import warnings
 from statsmodels.tsa.statespace.sarimax import SARIMAX
+from sklearn.metrics import mean_squared_error
 
 from src.models.model_interface import BaseModel
+warnings.filterwarnings('ignore')
 
 
 class SARIMAXModel(BaseModel):
@@ -21,12 +24,19 @@ class SARIMAXModel(BaseModel):
         """
         super().__init__(name, model_params)
         assert 'gap' in model_params.keys()
-        if model_params['gap'] == 0:
-            self.p_param = (1, 0, 0)    # Values from grid search
-            self.s_param = (1, 0, 0, 24)
-        else:
-            self.p_param = (2, 0, 1)
-            self.s_param = (2, 0, 1, 24)
+        # if model_params['gap'] == 0:
+        #     self.p_param = (1, 0, 0)    # Values from grid search
+        #     self.s_param = (1, 0, 0, 24)
+        # else:
+        #     self.p_param = (2, 0, 1)
+        #     self.s_param = (2, 0, 1, 24)
+        self.param = (model_params['p_param'],
+                      model_params['d_param'],
+                      model_params['q_param'])
+        self.s_param = (model_params['p_param'],
+                        model_params['d_param'],
+                        model_params['q_param'],
+                        model_params['s_param'])
         self.model = None
         self.fit_model = None
         self.training_data = None
@@ -60,13 +70,19 @@ class SARIMAXModel(BaseModel):
                     y -> (batch_size,)
         :return: np.array containing all predictions, shape: (n_test,)
         """
+        prediction = []
+        score_list = []
+        for batch in test_dataset:
+            inputs, targets = batch
+            data = inputs[:, :, 0].numpy()
+            data = data.ravel()
+            self.model = SARIMAX(data, order=self.param,
+                                 seasonal_order=self.s_param)
+            self.fit_model = self.model.fit(method='powell', disp=False)
+            forecast = self.fit_model.predict(len(data) + self.gap,
+                                              len(data) + self.gap)
+            prediction = np.concatenate((prediction, forecast))
 
-        data = test_dataset.SPOTPrice[:-168]
-        self.model = SARIMAX(data, order=self.p_param,
-                             seasonal_order=self.s_param)
-        self.fit_model = self.model.fit(method='powell', disp=False)
-        print(self.gap)
-        prediction = self.fit_model.predict(len(data)+self.gap, len(data)+self.gap)
         return prediction
 
     def save(self, path: str):
