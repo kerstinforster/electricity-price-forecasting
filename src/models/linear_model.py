@@ -4,7 +4,7 @@ import numpy as np
 from typing import Any
 
 from src.models.model_interface import BaseModel
-
+from sklearn.linear_model import LinearRegression
 
 class LinearModel(BaseModel):
     """
@@ -20,7 +20,9 @@ class LinearModel(BaseModel):
         :param model_params: Dictionary of parameters for the model
         """
         super().__init__(name, model_params)
+        self.model = LinearRegression(n_jobs=-1)
         self.gap = model_params.get('gap', 0)
+        self.batch_size = model_params.get('batch_size', 64)
 
     def train(self, dataset: Any, test_dataset: Any, model_params: dict) -> Any:  # pylint: disable=unused-argument
         """
@@ -36,7 +38,7 @@ class LinearModel(BaseModel):
         :param model_params: dictionary which sets the relevant hyperparameters
             for the training procedure
         """
-
+        pass
     def predict(self, test_dataset: Any) -> np.array:
         """
         Uses the trained model to make a prediction based on x_input
@@ -51,13 +53,19 @@ class LinearModel(BaseModel):
         prediction = np.empty(shape=(0, 1))
         for batch in test_dataset:
             x, _ = batch
-            spot_weekago = np.asarray(x)[:, -169, 0].reshape((-1, 1))
-            spot_weekagonext = np.asarray(x)[:, -169+self.gap+1, 0].reshape((-1, 1))
-            spot_diff_weekago = spot_weekagonext - spot_weekago
-            pred = np.asarray(x)[:, -1, 0].reshape((-1, 1)) + spot_diff_weekago
-            prediction = np.concatenate([prediction, pred], axis=0)
-
+            preds = np.empty(shape=(0,1))
+            for i in np.arange(x.shape[0]):
+                spot_weekago = np.asarray(x)[i, -169::-168, 0]
+                spot_weekago_next = np.asarray(x)[i, -169 + self.gap+1:self.gap:-168, 0]
+                spot_diff_weekago = spot_weekago_next - spot_weekago
+                input = np.arange(spot_diff_weekago.shape[0]).reshape(-1, 1)
+                self.model.fit(input, spot_diff_weekago)
+                pred = np.asarray(x)[i, -1, 0] + self.model.predict([input[-1]+1])
+                pred = pred.reshape(-1, 1)
+                preds = np.concatenate([preds, pred], axis=0)
+            prediction = np.concatenate([prediction,preds],axis=0)
         return prediction.reshape((-1,))
+
     def save(self, path: str):
         """
         Saves the model at the given path with the given name
