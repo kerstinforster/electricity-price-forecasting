@@ -37,9 +37,6 @@ if __name__ == '__main__':
     dg = DatasetGenerator(['all'])
     dataset = dg.get_dataset('2016-01-01', '2021-08-15', 'T23')
     train, test = train_test_split(dataset, 0.1)
-    dt = DataTransformer()
-    train = dt.fit_transform(train)
-    test = dt.transform_data(test)
 
     # Start the grid search
     grid_search = GridSearcher(all_model_param_grids)

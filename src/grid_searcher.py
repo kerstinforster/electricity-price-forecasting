@@ -10,6 +10,7 @@ import json
 from src.model_evaluator import ModelEvaluator
 from src.data.data_splitter import DataSplitter
 from src.models.model_factory import ModelFactory
+from src.data.data_transformer import DataTransformer
 
 
 class GridSearcher:
@@ -57,9 +58,14 @@ class GridSearcher:
 
     def train_model_config(self, model_config: dict, train_dataset: Any,
                            test_dataset: Any):
+        dt = DataTransformer()
+        train_norm = dt.fit_transform(train_dataset)
+        test_norm = dt.transform_data(test_dataset)
+
         splitter = DataSplitter(model_config)
-        train = splitter.split(train_dataset)
-        test = splitter.split(test_dataset)
+        train = splitter.split(train_norm)
+        test = splitter.split(test_norm)
+        test_raw = splitter.split(test_dataset)
 
         model = ModelFactory.get(model_config['model_name'], model_config)
         model.train(train, test, model_config)
@@ -69,7 +75,8 @@ class GridSearcher:
         model.save(model_path)
 
         prediction = model.predict(test)
-        return self.evaluator.evaluate(prediction, test)
+        prediction = dt.reverse_transform_spot(prediction)
+        return self.evaluator.evaluate(prediction, test_raw)
 
     @staticmethod
     def get_unique_model_path(model_config: dict) -> str:
