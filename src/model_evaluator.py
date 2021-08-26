@@ -82,6 +82,7 @@ class ModelEvaluator(object):
         smape)
         :return: scores_dict with the score of each requested metric
         """
+        y_pred = y_pred.reshape((-1,))
         total_target = np.empty(shape=(1))
         for batch in test_dataset:
             _, target = batch
