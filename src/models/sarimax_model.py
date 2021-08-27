@@ -4,7 +4,6 @@ from typing import Any
 import numpy as np
 import warnings
 from statsmodels.tsa.statespace.sarimax import SARIMAX
-from sklearn.metrics import mean_squared_error
 
 from src.models.model_interface import BaseModel
 warnings.filterwarnings('ignore')
@@ -30,6 +29,7 @@ class SARIMAXModel(BaseModel):
         # else:
         #     self.p_param = (2, 0, 1)
         #     self.s_param = (2, 0, 1, 24)
+        self.gap = model_params['gap']
         self.param = (model_params['p_param'],
                       model_params['d_param'],
                       model_params['q_param'])
@@ -41,7 +41,6 @@ class SARIMAXModel(BaseModel):
         self.fit_model = None
         self.training_data = None
         self.training_exog = None
-        self.gap = model_params['gap']
 
     def train(self, dataset: Any, test_dataset: Any, model_params: dict) -> Any:
         """
@@ -71,9 +70,8 @@ class SARIMAXModel(BaseModel):
         :return: np.array containing all predictions, shape: (n_test,)
         """
         prediction = []
-        score_list = []
         for batch in test_dataset:
-            inputs, targets = batch
+            inputs, _ = batch
             data = inputs[:, :, 0].numpy()
             data = data.ravel()
             self.model = SARIMAX(data, order=self.param,
@@ -83,7 +81,7 @@ class SARIMAXModel(BaseModel):
                                               len(data) + self.gap)
             prediction = np.concatenate((prediction, forecast))
 
-        return prediction
+        return np.array(prediction)
 
     def save(self, path: str):
         """

@@ -15,7 +15,7 @@ if __name__ == '__main__':
         'window_size': [80, 100, 150],
         'batch_size': [1],
         'gap': [0, 23, 168],  # Prediction horizons (hour, day, week)
-        'p_param': [0, 1, 2],
+        'p_param': [1, 2],
         'd_param': [0, 1, 2],
         'q_param': [0, 1],
         's_param': [24]
@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     # CREATE TRAIN AND TEST DATASET #
     dg = DatasetGenerator(['all'])
-    dataset = dg.get_dataset('2021-06-01', '2021-08-15', 'T23')
+    dataset = dg.get_dataset('2021-05-01', '2021-08-15', 'T23')
     train, test = train_test_split(dataset, 0.1)
 
     # Start the grid search
