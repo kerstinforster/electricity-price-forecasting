@@ -61,7 +61,8 @@ class LinearModel(BaseModel):
                                     -169 + self.gap+1:self.gap:-168,
                                     0]
                 spot_diff_weekago = spot_weekago_next - spot_weekago
-                linear_input = np.arange(spot_diff_weekago.shape[0]).reshape(-1, 1)
+                linear_input = np.arange(
+                    spot_diff_weekago.shape[0]).reshape(-1, 1)
                 self.model.fit(linear_input, spot_diff_weekago)
                 pred = np.asarray(x)[i, -1, 0] + \
                        self.model.predict([linear_input[-1]+1])
