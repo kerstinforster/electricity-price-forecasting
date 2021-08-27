@@ -33,13 +33,17 @@ def datasets():
 def test_model(model_name, datasets, gap):
     train, test = datasets
     model_config = {
-        'batch_size': 16,
+        'batch_size': 1,
         'window_size': 12,
         'gap': gap,
         'num_features': 19,
         'num_layers': 1,
         'hidden_layer_size': 64,
-        'epochs': 3
+        'epochs': 3,
+        'p_param': 1,
+        'd_param': 0,
+        'q_param': 0,
+        's_param': 24
     }
     # Create final training and testing datasets (batches and windows)
     splitter = DataSplitter(model_config)
