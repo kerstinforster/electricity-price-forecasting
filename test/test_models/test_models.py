@@ -34,7 +34,7 @@ def test_model(model_name, datasets, gap):
     train, test = datasets
     model_config = {
         'batch_size': 16,
-        'window_size': 12,
+        'window_size': 169,
         'gap': gap,
         'num_features': 19,
         'num_layers': 1,
@@ -50,7 +50,7 @@ def test_model(model_name, datasets, gap):
     model.train(train_dataset, test_dataset, model_config)
     prediction = model.predict(test_dataset)
 
-    assert prediction.shape == (1756 - 12 - gap + 1,)
+    assert prediction.shape == (1756 - 169 - gap + 1,)
 
     shutil.rmtree(f'data/test_models/{model_name}/', ignore_errors=True)
     os.makedirs(f'data/test_models/{model_name}/')

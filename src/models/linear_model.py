@@ -2,7 +2,8 @@
 
 import numpy as np
 from typing import Any
-
+import os
+import pickle as pkl
 from src.models.model_interface import BaseModel
 from sklearn.linear_model import LinearRegression
 
@@ -72,7 +73,10 @@ class LinearModel(BaseModel):
         For this model, no saving is necessary
         :param path: path and model name at location where model should be saved
         """
-        pass
+        with open(os.path.join(path, 'linear.bin'), 'wb') as file:
+            pkl.dump(self.model, file)
+        with open(os.path.join(path, 'model_params.bin'), 'wb') as file:
+            pkl.dump(self.model_params, file)
 
     def load(self, path: str):
         """
@@ -81,4 +85,13 @@ class LinearModel(BaseModel):
         :param path: path and model name at location where model should be
         loaded from
         """
-        pass
+        self.model_trained = True
+        with open(os.path.join(path, 'linear.bin'), 'rb') as file:
+            self.model = pkl.load(file)
+        with open(os.path.join(path, 'model_params.bin'), 'rb') as file:
+            self.model_params = pkl.load(file)
+        model_params = self.model_params
+        self.window_size = model_params.get('window_size', 7 * 24+1)
+        self.gap = model_params.get('gap', 0)
+        self.n_features = model_params.get('num_features', 19)
+        self.batch_size = model_params.get('batch_size', 64)
