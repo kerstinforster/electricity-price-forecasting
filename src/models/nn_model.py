@@ -6,8 +6,6 @@ import tensorflow as tf
 import os
 import pickle as pkl
 
-from keras.activations import relu, elu
-
 from src.models.model_interface import BaseModel
 
 

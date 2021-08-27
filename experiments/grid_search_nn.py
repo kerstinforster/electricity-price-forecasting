@@ -6,7 +6,7 @@ from src.data.dataset_generator import DatasetGenerator
 from src.data.data_splitter import train_test_split
 from src.data.data_transformer import DataTransformer
 from src.grid_searcher import GridSearcher
-from keras.activations import relu, elu, tanh, softmax
+from keras.activations import relu, elu
 
 
 if __name__ == '__main__':
