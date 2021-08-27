@@ -54,7 +54,7 @@ if __name__ == '__main__':
     nn_prediction = model.predict(test_dataset)
     model_evaluator = ModelEvaluator()
     print(f'Neural Network Model Scores: \n '
-          f'{model_evaluator.evaluate(nn_prediction, test_dataset)}')
+          f'{model_evaluator.evaluate(nn_prediction, test_raw_dataset)}')
 
     # Train linear regression model
     model = LinearRegressionModel(model_config)
