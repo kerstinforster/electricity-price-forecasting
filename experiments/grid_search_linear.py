@@ -12,7 +12,7 @@ if __name__ == '__main__':
     # define a parameter grid for each model
     linear_param_grid = {
         'model_name': ['linear'],
-        'window_size': [169,3000,4500, 5500],
+        'window_size': [169, 2000, 3000, 4500, 5500],
         'gap': [0, 23, 167],  # Prediction horizons (hour, day, week)
 
     }

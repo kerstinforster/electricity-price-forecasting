@@ -57,11 +57,14 @@ class LinearModel(BaseModel):
             preds = np.empty(shape=(0,1))
             for i in np.arange(x.shape[0]):
                 spot_weekago = np.asarray(x)[i, -169::-168, 0]
-                spot_weekago_next = np.asarray(x)[i, -169 + self.gap+1:self.gap:-168, 0]
+                spot_weekago_next = np.asarray(x)[i,
+                                    -169 + self.gap+1:self.gap:-168,
+                                    0]
                 spot_diff_weekago = spot_weekago_next - spot_weekago
-                input = np.arange(spot_diff_weekago.shape[0]).reshape(-1, 1)
-                self.model.fit(input, spot_diff_weekago)
-                pred = np.asarray(x)[i, -1, 0] + self.model.predict([input[-1]+1])
+                linear_input = np.arange(spot_diff_weekago.shape[0]).reshape(-1, 1)
+                self.model.fit(linear_input, spot_diff_weekago)
+                pred = np.asarray(x)[i, -1, 0] + \
+                       self.model.predict([linear_input[-1]+1])
                 pred = pred.reshape(-1, 1)
                 preds = np.concatenate([preds, pred], axis=0)
             prediction = np.concatenate([prediction,preds],axis=0)
