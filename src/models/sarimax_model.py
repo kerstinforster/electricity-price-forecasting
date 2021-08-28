@@ -2,11 +2,9 @@
 
 from typing import Any
 import numpy as np
-import warnings
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 from src.models.model_interface import BaseModel
-warnings.filterwarnings('ignore')
 
 
 class SARIMAXModel(BaseModel):
@@ -22,21 +20,21 @@ class SARIMAXModel(BaseModel):
         :param model_params: Dictionary of parameters for the model
         """
         super().__init__(name, model_params)
-        assert 'gap' in model_params.keys()
+        # assert 'gap' in model_params.keys()
         # if model_params['gap'] == 0:
         #     self.p_param = (1, 0, 0)    # Values from grid search
         #     self.s_param = (1, 0, 0, 24)
         # else:
         #     self.p_param = (2, 0, 1)
         #     self.s_param = (2, 0, 1, 24)
-        self.gap = model_params['gap']
-        self.param = (model_params['p_param'],
-                      model_params['d_param'],
-                      model_params['q_param'])
-        self.s_param = (model_params['p_param'],
-                        model_params['d_param'],
-                        model_params['q_param'],
-                        model_params['s_param'])
+        self.gap = model_params.get('gap', 0)
+        self.param = (model_params.get('p_param', 1),
+                      model_params.get('d_param', 0),
+                      model_params.get('q_param', 0))
+        self.s_param = (model_params.get('p_param', 1),
+                        model_params.get('d_param', 0),
+                        model_params.get('q_param', 0),
+                        model_params.get('s_param', 24))
         self.model = None
         self.fit_model = None
         self.training_data = None
@@ -73,15 +71,15 @@ class SARIMAXModel(BaseModel):
         for batch in test_dataset:
             inputs, _ = batch
             data = inputs[:, :, 0].numpy()
-            data = data.ravel()
-            self.model = SARIMAX(data, order=self.param,
-                                 seasonal_order=self.s_param)
-            self.fit_model = self.model.fit(method='powell', disp=False)
-            forecast = self.fit_model.predict(len(data) + self.gap,
-                                              len(data) + self.gap)
-            prediction = np.concatenate((prediction, forecast))
+            for slices in data:
+                self.model = SARIMAX(slices, order=self.param,
+                                     seasonal_order=self.s_param)
+                self.fit_model = self.model.fit(method='powell', disp=False)
+                forecast = self.fit_model.predict(len(slices) + self.gap,
+                                                  len(slices) + self.gap)
+                prediction = np.concatenate((prediction, forecast))
 
-        return np.array(prediction)
+        return prediction
 
     def save(self, path: str):
         """
