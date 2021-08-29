@@ -11,15 +11,19 @@ from keras.activations import relu, elu
 
 if __name__ == '__main__':
     # define a parameter grid for each model
+    # for each gap separate grid:
+    # {'gap' = [0], 'window_size' = [12, 24, 36]}
+    # {'gap' = [23], 'window_size' = [24, 48, 96]}
+    # {'gap' = [167], 'window_size' = [24, 168, 336]}
     nn_param_grid = {
         'model_name': ['nn'],
-        'window_size': [12, 24, 36, 48, 96, 168, 336],
-        'gap': [0, 23, 167],  # Prediction horizons (hour, day, week)
-        'first_HL_size': [8, 64, 128, 256],
-        'second_HL_size': [8, 64, 128, 256],
+        'window_size': [12, 24, 36],
+        'gap': [0], # Prediction horizons (hour, day, week)
+        'first_HL_size': [64, 128, 256],
+        'second_HL_size': [64, 128, 256],
         #'batch_size': [32, 64],
         #'epochs': [25, 50, 100],
-        'drop': [0, 0.1, 0.5],
+        'drop': [0, 0.3],
         'activ': ['relu', 'elu']
     }
 
