@@ -2,6 +2,9 @@
 
 from typing import Any
 import numpy as np
+import re
+import os
+import pickle as pkl
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 from src.models.model_interface import BaseModel
@@ -87,7 +90,9 @@ class SARIMAXModel(BaseModel):
         For this model, no saving is necessary
         :param path: path and model name at location where model should be saved
         """
-        pass
+        # self.model.save(path)
+        with open(os.path.join(path, 'model_params.bin'), 'wb') as file:
+            pkl.dump(self.model_params, file)
 
     def load(self, path: str):
         """
@@ -96,4 +101,10 @@ class SARIMAXModel(BaseModel):
         :param path: path and model name at location where model should be
         loaded from
         """
-        pass
+        with open(os.path.join(path, 'model_params.bin'), 'rb') as file:
+            self.model_params = pkl.load(file)
+        model_params = self.model_params
+        self.gap = model_params.get('gap', 0)
+        # gap = re.search('_gap-(\d+)', path)
+        # gap = re.findall('[0-9]+', gap.group())
+        # self.gap = int(gap[0])
