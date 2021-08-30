@@ -2,7 +2,6 @@
 
 from typing import Any
 import numpy as np
-import re
 import os
 import pickle as pkl
 from statsmodels.tsa.statespace.sarimax import SARIMAX
@@ -23,13 +22,6 @@ class SARIMAXModel(BaseModel):
         :param model_params: Dictionary of parameters for the model
         """
         super().__init__(name, model_params)
-        # assert 'gap' in model_params.keys()
-        # if model_params['gap'] == 0:
-        #     self.p_param = (1, 0, 0)    # Values from grid search
-        #     self.s_param = (1, 0, 0, 24)
-        # else:
-        #     self.p_param = (2, 0, 1)
-        #     self.s_param = (2, 0, 1, 24)
         self.gap = model_params.get('gap', 0)
         self.param = (model_params.get('p_param', 1),
                       model_params.get('d_param', 0),
