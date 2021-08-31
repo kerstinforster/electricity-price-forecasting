@@ -3,6 +3,7 @@
 from src.models.linear_regression_model import LinearRegressionModel
 from src.models.lstm_model import LSTMModel
 from src.models.trivial_model import TrivialModel
+from src.models.nn_model import NeuralNetworkModel
 
 
 class ModelFactory:
@@ -28,6 +29,9 @@ class ModelFactory:
 
         elif model_name == 'trivial':
             return TrivialModel(model_params)
+
+        elif model_name == 'nn':
+            return NeuralNetworkModel(model_params)
 
         else:
             raise ValueError(f'The model with the name "{model_name}" '

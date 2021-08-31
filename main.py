@@ -7,6 +7,7 @@ from src.data.data_transformer import DataTransformer
 from src.data.data_splitter import DataSplitter, train_test_split
 from src.models.linear_regression_model import LinearRegressionModel
 from src.models.lstm_model import LSTMModel
+from src.models.nn_model import NeuralNetworkModel
 from src.models.trivial_model import TrivialModel
 from src.model_evaluator import ModelEvaluator
 
@@ -46,6 +47,14 @@ if __name__ == '__main__':
     trivial_prediction = dt.reverse_transform_spot(trivial_prediction)
     print(f'Trivial Model Scores: \n '
           f'{model_evaluator.evaluate(trivial_prediction, test_raw_dataset)}')
+
+    # Train Neural Network model
+    model = NeuralNetworkModel(model_config)
+    model.train(train_dataset, test_dataset, {'epochs': 100})
+    nn_prediction = model.predict(test_dataset)
+    model_evaluator = ModelEvaluator()
+    print(f'Neural Network Model Scores: \n '
+          f'{model_evaluator.evaluate(nn_prediction, test_raw_dataset)}')
 
     # Train linear regression model
     model = LinearRegressionModel(model_config)
