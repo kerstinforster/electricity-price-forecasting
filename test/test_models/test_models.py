@@ -97,3 +97,46 @@ def test_model_linear(model_name, datasets, gap):
     assert np.array_equal(prediction, new_prediction)
     shutil.rmtree(f'data/test_models/{model_name}/')
 
+
+@pytest.mark.parametrize('model_name', ['sarimax'])
+@pytest.mark.parametrize('gap', [0, 23, 167])
+def test_model_sarimax(model_name, gap):
+
+    model_config = {
+        'batch_size': 16,
+        'window_size': 12,
+        'gap': gap,
+        'num_features': 19,
+        'num_layers': 1,
+        'hidden_layer_size': 64,
+        'epochs': 3,
+        'p_param': 1,
+        'd_param': 0,
+        'q_param': 0,
+        's_param': 24
+    }
+    dataset = DatasetGenerator().get_dataset('2020-12-20', '2020-12-31', 'T23')
+
+    # Normalize the data
+    dt = DataTransformer()
+    test = dt.fit_transform(dataset)
+    # Create final training and testing datasets (batches and windows)
+    splitter = DataSplitter(model_config)
+    test_dataset = splitter.split(test)
+
+    model = ModelFactory.get(model_name, model_config)
+    model.train(None, test_dataset, model_config)
+    prediction = model.predict(test_dataset)
+
+    assert prediction.shape == (12*24 - 12 - gap,)
+
+    shutil.rmtree(f'data/test_models/{model_name}/', ignore_errors=True)
+    os.makedirs(f'data/test_models/{model_name}/')
+    model.save(f'data/test_models/{model_name}/')
+
+    new_model = ModelFactory.get(model_name, {})
+    new_model.load(f'data/test_models/{model_name}/')
+    new_prediction = new_model.predict(test_dataset)
+    assert np.array_equal(prediction, new_prediction)
+    shutil.rmtree(f'data/test_models/{model_name}/')
+

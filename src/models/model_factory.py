@@ -3,6 +3,7 @@
 from src.models.linear_regression_model import LinearRegressionModel
 from src.models.lstm_model import LSTMModel
 from src.models.trivial_model import TrivialModel
+from src.models.sarimax_model import SARIMAXModel
 from src.models.linear_model import LinearModel
 from src.models.nn_model import NeuralNetworkModel
 
@@ -30,6 +31,9 @@ class ModelFactory:
 
         elif model_name == 'trivial':
             return TrivialModel(model_params)
+
+        elif model_name == 'sarimax':
+            return SARIMAXModel(model_params)
 
         elif model_name == 'linear':
             return LinearModel(model_params)

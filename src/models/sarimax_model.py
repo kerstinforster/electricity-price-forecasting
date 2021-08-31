@@ -2,6 +2,8 @@
 
 from typing import Any
 import numpy as np
+import os
+import pickle as pkl
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 from src.models.model_interface import BaseModel
@@ -20,13 +22,14 @@ class SARIMAXModel(BaseModel):
         :param model_params: Dictionary of parameters for the model
         """
         super().__init__(name, model_params)
-        assert 'gap' in model_params.keys()
-        if model_params['gap'] == 0:
-            self.p_param = (0, 2, 0)    # Values from grid search
-            self.s_param = (0, 2, 0, 24)
-        else:
-            self.p_param = (2, 1, 1)
-            self.s_param = (2, 1, 1, 24)
+        self.gap = model_params.get('gap', 0)
+        self.param = (model_params.get('p_param', 1),
+                      model_params.get('d_param', 0),
+                      model_params.get('q_param', 0))
+        self.s_param = (model_params.get('p_param', 1),
+                        model_params.get('d_param', 0),
+                        model_params.get('q_param', 0),
+                        model_params.get('s_param', 24))
         self.model = None
         self.fit_model = None
         self.training_data = None
@@ -59,12 +62,18 @@ class SARIMAXModel(BaseModel):
                     y -> (batch_size,)
         :return: np.array containing all predictions, shape: (n_test,)
         """
-        # TODO: This function is not working yet
-        data = None
-        self.model = SARIMAX(data, order=self.p_param,
-                             seasonal_order=self.s_param)
-        self.fit_model = self.model.fit()
-        prediction = self.fit_model.predict(test_dataset)
+        prediction = []
+        for batch in test_dataset:
+            inputs, _ = batch
+            data = inputs[:, :, 0].numpy()
+            for slices in data:
+                self.model = SARIMAX(slices, order=self.param,
+                                     seasonal_order=self.s_param)
+                self.fit_model = self.model.fit(method='powell', disp=False)
+                forecast = self.fit_model.predict(len(slices) + self.gap,
+                                                  len(slices) + self.gap)
+                prediction = np.concatenate((prediction, forecast))
+
         return prediction
 
     def save(self, path: str):
@@ -73,7 +82,9 @@ class SARIMAXModel(BaseModel):
         For this model, no saving is necessary
         :param path: path and model name at location where model should be saved
         """
-        pass
+        # self.model.save(path)
+        with open(os.path.join(path, 'model_params.bin'), 'wb') as file:
+            pkl.dump(self.model_params, file)
 
     def load(self, path: str):
         """
@@ -82,4 +93,10 @@ class SARIMAXModel(BaseModel):
         :param path: path and model name at location where model should be
         loaded from
         """
-        pass
+        with open(os.path.join(path, 'model_params.bin'), 'rb') as file:
+            self.model_params = pkl.load(file)
+        model_params = self.model_params
+        self.gap = model_params.get('gap', 0)
+        # gap = re.search('_gap-(\d+)', path)
+        # gap = re.findall('[0-9]+', gap.group())
+        # self.gap = int(gap[0])
