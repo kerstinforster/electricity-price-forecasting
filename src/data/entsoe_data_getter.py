@@ -189,8 +189,8 @@ class EntsoeDataGetter(BaseDataGetter):
             load_temp = load1
 
         if start2 is not None and end2 is not None:
-            load2 = pd.Series(self.client.query_load(self.country_code2, start=start2,
-                                           end=end2))
+            load2 = self.client.query_load(self.country_code2, start=start2,
+                                           end=end2)
             if isinstance(load2, pd.Series):
                 load2 = load2.to_frame('Load')
             load2 = load2.rename_axis('time').resample('1H').sum()/4
