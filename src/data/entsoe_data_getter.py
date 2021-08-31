@@ -178,8 +178,10 @@ class EntsoeDataGetter(BaseDataGetter):
 
         if start1 is not None and end1 is not None:
             load1 = self.client.query_load(self.country_code1, start=start1,
-                                           end=end1).to_frame('Load') \
-                        .rename_axis('time').resample('1H').sum()/4
+                                           end=end1)
+            if isinstance(load1, pd.Series):
+                load1 = load1.to_frame('Load')
+            load1 = load1.rename_axis('time').resample('1H').sum()/4
             load1.set_axis(['load1'], axis='columns', inplace=True)
             load1.reset_index(level=0, inplace=True)
             if start2 is not None and end2 is not None:
