@@ -1,0 +1,10 @@
+venv
+.venv
+.coverage
+.coveragerc
+.idea
+coverage.xml
+.pytest_cache
+html_coverage
+results
+
