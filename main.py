@@ -10,7 +10,6 @@ from src.models.lstm_model import LSTMModel
 from src.models.nn_model import NeuralNetworkModel
 from src.models.trivial_model import TrivialModel
 from src.model_evaluator import ModelEvaluator
-from src.models.linear_model import LinearModel
 
 
 if __name__ == '__main__':
