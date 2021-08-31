@@ -10,6 +10,7 @@ from src.models.lstm_model import LSTMModel
 from src.models.nn_model import NeuralNetworkModel
 from src.models.trivial_model import TrivialModel
 from src.model_evaluator import ModelEvaluator
+from src.models.linear_model import LinearModel
 
 
 if __name__ == '__main__':
@@ -40,13 +41,6 @@ if __name__ == '__main__':
     test_dataset = splitter.split(test)
     test_raw_dataset = splitter.split(test_raw)
 
-    model = LinearModel(model_config)
-    model.train(train_dataset, test_dataset, {})
-    trivial_prediction = model.predict(test_dataset)
-    model_evaluator = ModelEvaluator()
-    print(f'Linear Model Scores: \n '
-          f'{model_evaluator.evaluate(trivial_prediction, test_dataset)}')
-
     model = TrivialModel(model_config)
     model.train(train_dataset, test_dataset, {})
     trivial_prediction = model.predict(test_dataset)
@@ -57,24 +51,25 @@ if __name__ == '__main__':
 
     # Train Neural Network model
     model = NeuralNetworkModel(model_config)
-    model.train(train_dataset, test_dataset, {'epochs': 100})
+    model.train(train_dataset, test_dataset, {'epochs': 3})
     nn_prediction = model.predict(test_dataset)
     model_evaluator = ModelEvaluator()
+    nn_prediction = dt.reverse_transform_spot(nn_prediction)
     print(f'Neural Network Model Scores: \n '
           f'{model_evaluator.evaluate(nn_prediction, test_raw_dataset)}')
 
     # Train linear regression model
     model = LinearRegressionModel(model_config)
     model.train(train_dataset, test_dataset, {})
-    linear_prediction = model.predict(test_dataset)
-    linear_prediction = dt.reverse_transform_spot(linear_prediction)
+    linearr_prediction = model.predict(test_dataset)
+    linearr_prediction = dt.reverse_transform_spot(linearr_prediction)
     model_evaluator = ModelEvaluator()
     print(f'Linear Regression Model Scores: \n '
-          f'{model_evaluator.evaluate(linear_prediction, test_raw_dataset)}')
+          f'{model_evaluator.evaluate(linearr_prediction, test_raw_dataset)}')
 
     # Train LSTM model
     model = LSTMModel(model_config)
-    model.train(train_dataset, test_dataset, {'epochs': 10})
+    model.train(train_dataset, test_dataset, {'epochs': 3})
     lstm_prediction = model.predict(test_dataset)
     lstm_prediction = dt.reverse_transform_spot(lstm_prediction)
     model_evaluator = ModelEvaluator()
