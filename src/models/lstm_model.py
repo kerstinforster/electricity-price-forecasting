@@ -28,6 +28,7 @@ class LSTMModel(BaseModel):
         self.input_size = model_params.get('num_features', 19)
         self.batch_size = model_params.get('batch_size', 64)
         self.window_size = model_params.get('window_size', 7*24)
+        self.regularization = model_params.get('regularization', 0.01)
         self.model = tf.keras.models.Sequential()
         layer_size = self.hidden_layer_size if isinstance(
             self.hidden_layer_size, int) else self.hidden_layer_size[0]
@@ -35,16 +36,21 @@ class LSTMModel(BaseModel):
             layer_size,
             input_shape=(self.window_size, self.input_size),
             return_sequences=True,
-            kernel_regularizer=tf.keras.regularizers.L1L2(l1=0.01, l2=0.01)))
+            kernel_regularizer=tf.keras.regularizers.L1L2(
+                l1=self.regularization, l2=self.regularization)))
         for i in range(self.num_layers - 1):
             layer_size = self.hidden_layer_size if isinstance(
                 self.hidden_layer_size, int) else self.hidden_layer_size[i]
             self.model.add(tf.keras.layers.LSTM(
                 layer_size, return_sequences=True,
-                kernel_regularizer=tf.keras.regularizers.L1L2(l1=0.01, l2=0.01)
+                kernel_regularizer=tf.keras.regularizers.L1L2(
+                    l1=self.regularization, l2=self.regularization)
             ))
         self.model.add(tf.keras.layers.Flatten())
-        self.model.add(tf.keras.layers.Dense(units=1))
+        self.model.add(tf.keras.layers.Dense(
+            units=1,
+            kernel_regularizer=tf.keras.regularizers.L1L2(
+                l1=self.regularization, l2=self.regularization)))
 
         self.history = None
 
@@ -65,7 +71,7 @@ class LSTMModel(BaseModel):
         epochs = model_params.get('epochs', 100)
 
         early_stopping = tf.keras.callbacks.EarlyStopping(
-            monitor='val_loss', patience=10, mode='min',
+            monitor='val_loss', patience=20, mode='min',
             restore_best_weights=True)
 
         self.model.compile(loss=tf.losses.MeanSquaredError(),
