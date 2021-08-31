@@ -39,11 +39,7 @@ def test_model(model_name, datasets, gap):
         'num_features': 19,
         'num_layers': 1,
         'hidden_layer_size': 64,
-        'epochs': 3,
-        'p_param': 1,
-        'd_param': 0,
-        'q_param': 0,
-        's_param': 24
+        'epochs': 3
     }
     # Create final training and testing datasets (batches and windows)
     splitter = DataSplitter(model_config)
@@ -113,7 +109,11 @@ def test_model_sarimax(model_name, gap):
         'num_features': 19,
         'num_layers': 1,
         'hidden_layer_size': 64,
-        'epochs': 3
+        'epochs': 3,
+        'p_param': 1,
+        'd_param': 0,
+        'q_param': 0,
+        's_param': 24
     }
     dataset = DatasetGenerator().get_dataset('2020-12-20', '2020-12-31', 'T23')
 
