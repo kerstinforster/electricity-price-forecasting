@@ -47,7 +47,7 @@ class GridSearcher:
                     scores = self.train_model_config(
                         model_config, train_dataset, test_dataset)
                     self.results.append((model_config, scores))
-                    bar()  # pylint: disable=E1102
+                    bar()  # pylint: disable=not-callable
         with open(self.results_file_path, 'w', encoding='utf-8') as file:
             json.dump(self.results, file)
 
