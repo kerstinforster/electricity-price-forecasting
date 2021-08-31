@@ -50,24 +50,25 @@ if __name__ == '__main__':
 
     # Train Neural Network model
     model = NeuralNetworkModel(model_config)
-    model.train(train_dataset, test_dataset, {'epochs': 100})
+    model.train(train_dataset, test_dataset, {'epochs': 3})
     nn_prediction = model.predict(test_dataset)
     model_evaluator = ModelEvaluator()
+    nn_prediction = dt.reverse_transform_spot(nn_prediction)
     print(f'Neural Network Model Scores: \n '
           f'{model_evaluator.evaluate(nn_prediction, test_raw_dataset)}')
 
     # Train linear regression model
     model = LinearRegressionModel(model_config)
     model.train(train_dataset, test_dataset, {})
-    linear_prediction = model.predict(test_dataset)
-    linear_prediction = dt.reverse_transform_spot(linear_prediction)
+    linearr_prediction = model.predict(test_dataset)
+    linearr_prediction = dt.reverse_transform_spot(linearr_prediction)
     model_evaluator = ModelEvaluator()
     print(f'Linear Regression Model Scores: \n '
-          f'{model_evaluator.evaluate(linear_prediction, test_raw_dataset)}')
+          f'{model_evaluator.evaluate(linearr_prediction, test_raw_dataset)}')
 
     # Train LSTM model
     model = LSTMModel(model_config)
-    model.train(train_dataset, test_dataset, {'epochs': 10})
+    model.train(train_dataset, test_dataset, {'epochs': 3})
     lstm_prediction = model.predict(test_dataset)
     lstm_prediction = dt.reverse_transform_spot(lstm_prediction)
     model_evaluator = ModelEvaluator()
