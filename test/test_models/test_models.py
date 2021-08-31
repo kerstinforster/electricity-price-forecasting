@@ -65,7 +65,7 @@ def test_model(model_name, datasets, gap):
 
 @pytest.mark.parametrize('model_name', ['linear'])
 @pytest.mark.parametrize('gap', [0, 23, 167])
-def test_model(model_name, datasets, gap):
+def test_model_linear(model_name, datasets, gap):
     train, test = datasets
     model_config = {
         'batch_size': 16,
