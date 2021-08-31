@@ -18,4 +18,5 @@ def test_differencing():
     pseudo_dataset.reset_index(drop=True, inplace=True)
     reverse_data = differencer.reverse_difference(pseudo_prediction)
 
-    assert pseudo_dataset.astype(int).equals(reverse_data.astype(int))
+    assert pseudo_dataset.drop('Time',axis=1).astype('float').equals(reverse_data.drop('Time', axis=1).astype('float'))
+
