@@ -21,10 +21,16 @@ def request_montel_data() -> pd.DataFrame:
 
     :return: Dataframe with columns 'Time' and 'SPOTPrice'
     """
-    # TODO: switch to end_date='latest' when merging
     dg = DatasetGenerator(['montel'])
     return dg.get_dataset(start_date='2016-01-01', end_date='latest',
                           end_time='T23')
+
+
+def get_date_and_time():
+    from datetime import datetime
+    date = datetime.now().strftime('%Y-%m-%d')
+    hour = datetime.now().strftime('T%H')
+    return date, hour
 
 
 def request_prediction(
@@ -41,23 +47,29 @@ def request_prediction(
     :param required_prediction: string that specifies time of the prediction
     :return: Dataframe with a single row 'Time', 'SPOTPrice', 'TimeType'
     """
+    date, time = get_date_and_time()
+    fp = FinalPredictor(date, time)
+
     if required_prediction == "one_hour_prediction":
-        # TODO: this is a mock up, copies value 24h ago
-        prediction = adjust_time(df.iloc[-24].copy(), n_days=1)
-        prediction['TimeType'] = 'prediction'
-        return prediction
+        frame = df.iloc[-1].copy()
+        frame['Time'] = frame['Time'] + pd.Timedelta(hours=1)
+        frame['SPOTPrice'] = fp.predict_hour()
+        frame['TimeType'] = 'prediction'
+        return frame
 
     elif required_prediction == "one_day_prediction":
-        # TODO: this is a mock up, copies value 168h (1 week) ago
-        prediction = adjust_time(df.iloc[-168].copy(), n_days=8)
-        prediction['TimeType'] = 'prediction'
-        return prediction
+        frame = df.iloc[-1].copy()
+        frame['Time'] = frame['Time'] + pd.Timedelta(hours=24)
+        frame['SPOTPrice'] = fp.predict_day()
+        frame['TimeType'] = 'prediction'
+        return frame
 
     elif required_prediction == "one_week_prediction":
-        # TODO: this is a mock up, copies value 672h (4 weeks) ago
-        prediction = adjust_time(df.iloc[-672].copy(), n_days=35)
-        prediction['TimeType'] = 'prediction'
-        return prediction
+        frame = df.iloc[-1].copy()
+        frame['Time'] = frame['Time'] + pd.Timedelta(hours=168)
+        frame['SPOTPrice'] = fp.predict_week()
+        frame['TimeType'] = 'prediction'
+        return frame
 
     else:
         raise ValueError('required_prediction has an invalid value in the'

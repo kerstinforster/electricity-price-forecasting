@@ -84,7 +84,7 @@ def get_one_day_fill(df: pd.DataFrame) -> pd.DataFrame:
     df = get_last_24_hours_data(df)
     df = adjust_time(df, n_days=1)
     df['TimeType'] = 'fill'
-    return df
+    return df.iloc[:-1, :]
 
 
 def get_one_week_fill(df: pd.DataFrame) -> pd.DataFrame:
@@ -97,7 +97,7 @@ def get_one_week_fill(df: pd.DataFrame) -> pd.DataFrame:
     df = get_last_7_days_data(df)
     df = adjust_time(df, n_days=7)
     df['TimeType'] = 'fill'
-    return df
+    return df.iloc[:-1, :]
 
 
 def create_plot_df(past: pd.DataFrame,

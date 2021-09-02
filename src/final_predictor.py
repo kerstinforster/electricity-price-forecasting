@@ -1,5 +1,7 @@
 """ Final predictor used to perform the three predictions with the final models """
 
+from tensorflow.keras.preprocessing import timeseries_dataset_from_array
+
 from src.models.model_factory import ModelFactory
 from src.data.data_transformer import DataTransformer
 from src.data.dataset_generator import DatasetGenerator
@@ -28,41 +30,43 @@ class FinalPredictor:
         transformer = DataTransformer.load(model_path)
         scaled_data = transformer.transform_data(dataset)
         data = scaled_data.drop('Time', axis=1)
-        return (data.iloc[-window_size:, :].values.reshape((1, window_size, 19)),
-                transformer)
+        data = data.iloc[-window_size:, :]
+        batches = timeseries_dataset_from_array(
+            data, [0], sequence_length=window_size, batch_size=1, shuffle=False)
+        return (batches, transformer)
 
     def predict_hour(self) -> float:
         """
         Predict one hour ahead SPOT Price
         :return: The predicted SPOT Price
         """
-        data, transformer = self.get_data('results/gap_0', 336)
-        model = ModelFactory.get('lstm', {})
-        model.load('results/gap_0')
+        data, transformer = self.get_data('models/gap_0', 168)
+        model = ModelFactory.get('linear_regression', {})
+        model.load('models/gap_0')
         prediction = model.predict(data)
         prediction = transformer.reverse_transform_spot(prediction)
-        return prediction
+        return prediction[0, 0]
 
     def predict_day(self) -> float:
         """
         Predict one day ahead SPOT Price
         :return: The predicted SPOT Price
         """
-        data, transformer = self.get_data('results/gap_23', 168)
+        data, transformer = self.get_data('models/gap_23', 168)
         model = ModelFactory.get('lstm', {})
-        model.load('results/gap_0')
+        model.load('models/gap_23')
         prediction = model.predict(data)
         prediction = transformer.reverse_transform_spot(prediction)
-        return prediction
+        return prediction[0, 0]
 
     def predict_week(self) -> float:
         """
         Predict one week ahead SPOT Price
         :return: The predicted SPOT Price
         """
-        data, transformer = self.get_data('results/gap_167', 168)
+        data, transformer = self.get_data('models/gap_167', 168)
         model = ModelFactory.get('nn', {})
-        model.load('results/gap_0')
+        model.load('models/gap_167')
         prediction = model.predict(data)
         prediction = transformer.reverse_transform_spot(prediction)
-        return prediction
+        return prediction[0, 0]

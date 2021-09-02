@@ -1,6 +1,8 @@
 # Project specific
 html_coverage
-data/
+data/entsoe_test
+data/montel_test
+data/test_models
 !src/data
 results
 
