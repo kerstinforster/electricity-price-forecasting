@@ -2,6 +2,8 @@
 metrics to evaluate the performance of the time series predictions"""
 
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 from typing import Any
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 
@@ -66,6 +68,79 @@ class ModelEvaluator(object):
             np.sum(2 * np.abs(y_pred - y_true) /
                    (np.abs(y_true) + np.abs(y_pred))[mask])
         return smape
+
+    @staticmethod
+    def _create_comparison_plot(y_pred: pd.DataFrame, y_true: pd.DataFrame,
+                                save_at: str, plot_name: str):
+        """
+        Creates a single plot with the data from the 2 given dataframes
+        :param y_pred: dataframe containing 'Time' and 'PredictedSPOTPrice'
+        :param y_true: dataframe containing 'Time' and 'SPOTPrice'
+        :param save_at: path to the directory to save the plot images
+        :param plot_name: name of the plot image. Has to end with .png
+        :return: matplotlib fig and ax object of the plot
+        """
+
+        fig, ax = plt.subplots()
+        y_pred.plot(kind='line', x='Time', y='PredictedSPOTPrice', ax=ax)
+        y_true.plot(kind='line', x='Time', y='SPOTPrice', ax=ax)
+        plt.grid()
+        plt.legend()
+        plt.xlabel('Time [h]')
+        plt.ylabel('Price [€ / MWh]')
+        plt.tight_layout()
+        plt.savefig(save_at + plot_name)
+
+        return fig, ax
+
+    def create_all_comparison_plots(self, y_pred: pd.DataFrame,
+                                    y_true: pd.DataFrame,
+                                    save_at: str,
+                                    n_steps: int = 72,
+                                    show_plots: bool = False):
+        """
+        Creates 3 plots which visualize the our predictions compared to the
+        labels. One plot shows the first n_steps of the test data, one plot
+        shows the last n_steps (this is done so one can still see enough details
+        in the plots). The 3rd plot shows all the test data and our predictions.
+
+        :param y_pred: dataframe containing 'Time' and 'PredictedSPOTPrice'
+        :param y_true: dataframe containing 'Time' and 'SPOTPrice'
+        :param save_at: path to the directory to save the plot images
+        :param n_steps: number of steps shown in the 2 smaller plots
+        :param show_plots: flag whether to show the plots in the IDE
+        :return:
+        """
+
+        start_data_pred = y_pred.head(n_steps)
+        start_data_true = y_true.head(n_steps)
+
+        end_data_pred = y_pred.tail(n_steps)
+        end_data_true = y_true.tail(n_steps)
+
+        fig_start, _ = self._create_comparison_plot(  # pylint: disable=unused-variable
+            y_pred=start_data_pred,
+            y_true=start_data_true,
+            save_at=save_at,
+            plot_name='comparison_start.png'
+        )
+
+        fig_end, _ = self._create_comparison_plot(  # pylint: disable=unused-variable
+            y_pred=end_data_pred,
+            y_true=end_data_true,
+            save_at=save_at,
+            plot_name='comparison_end.png'
+        )
+
+        fig_all, _ = self._create_comparison_plot(  # pylint: disable=unused-variable
+            y_pred=y_pred,
+            y_true=y_true,
+            save_at=save_at,
+            plot_name='comparison_all.png'
+        )
+
+        if show_plots:
+            plt.show()
 
     def evaluate(self, y_pred: np.array, test_dataset: Any,
                  eval_metrics: list = None) -> dict:
