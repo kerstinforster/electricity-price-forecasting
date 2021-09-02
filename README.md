@@ -1,8 +1,6 @@
-<div style="text-align: right; margin-top: 10px; margin-bottom: -30px;"> 
-<img height="50px" class="center-block" src="https://www.tum.de/typo3conf/ext/in2template/Resources/Public/Images/tum-logo.svg">
-</div>
+![Currence Logo](src/frontend/resources/currence_logo_big.png)
 
-# Group 3 Applied Machine Intelligence
+# Currence Project
 
 This is the project repository of group 3 for the course Applied Machine Intelligence at TUM.  
 Group Members:
@@ -29,12 +27,33 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Execution
+## Frontend
 Run the frontend / web application:
 Go to the root repository 'group03' in your terminal and then type:
 ```console
 streamlit run web_app.py
 ```
+
+## Docker
+The docker container of this repository already has all dependencies installed and runs
+out of the box.   
+You can either build the container yourself or download the prebuilt container.  
+To build the container, run:
+```console
+docker build -t currence-container -f docker/Dockerfile --build-arg token=TOKEN.
+```
+Hereby, the `TOKEN` build argument is optional and should be replaced with the current Montel API Bearer Token.  
+
+To download the prebuild container, run:
+```console
+docker pull something
+```
+
+Finally, run the container using:
+```console
+bash docker/docker_run.sh
+```
+You can add an optional `-d` flag to the docker run command to run the docker container in the background.
 
 ## Linter
 Run the linter:

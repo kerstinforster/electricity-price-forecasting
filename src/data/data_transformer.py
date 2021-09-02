@@ -1,5 +1,9 @@
 """ This file contains a data transformer that normalizes the dataset. """
 
+from typing import Any
+
+import os
+import pickle as pkl
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
@@ -69,3 +73,20 @@ class DataTransformer:
             data = np.reshape(data, (-1, 1))
         return self.spot_scaler.inverse_transform(data)
 
+    def save(self, path: str) -> None:
+        """
+        Save the scaler to be able to reuse it for predictions
+        :param path: Folder to store the scaler at
+        """
+        with open(os.path.join(path, 'transformer.bin'), 'wb') as file:
+            pkl.dump(self, file)
+
+    @staticmethod
+    def load(path: str) -> Any:
+        """
+        Load a saved scaler to be able to reuse it for predictions
+        :param path: Folder where the scaler was saved at
+        """
+        with open(os.path.join(path, 'transformer.bin'), 'rb') as file:
+            transformer = pkl.load(file)
+        return transformer

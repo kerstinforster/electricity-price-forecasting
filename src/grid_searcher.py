@@ -73,6 +73,7 @@ class GridSearcher:
         model_path = self.get_unique_model_path(model_config)
         os.makedirs(model_path)
         model.save(model_path)
+        dt.save(model_path)
 
         prediction = model.predict(test)
         prediction = dt.reverse_transform_spot(prediction)

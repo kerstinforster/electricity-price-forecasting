@@ -26,6 +26,17 @@ def test_show_all_datasets():
     shutil.rmtree(dg.data_dir)
 
 
+def test_token_environment_variable():
+    # Instantiate Montel Data Getter -> only works if token is valid
+    dg = MontelDataGetter("montel_test")
+    token = dg.token
+    file_path = os.path.join(dg._root_dir, 'src', 'data',
+                             'MONTEL_TOKEN.txt')
+    os.remove(file_path)
+    os.environ['MONTEL_TOKEN'] = token
+    dg.get_token()  # Throws an error if token is invalid or not there
+
+
 def test_get_and_process_data():
     dg = MontelDataGetter("montel_test")
 

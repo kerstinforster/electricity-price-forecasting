@@ -29,7 +29,12 @@ class MontelDataGetter(BaseDataGetter):
         self.get_token()
         self.now_date = datetime.now().strftime('%Y-%m-%d')
 
-    def get_token(self):
+    def get_token(self, force: bool = False) -> None:
+        """
+        Function that tries getting the token from either the MWN server
+        or an environment variable.
+        :param force: Flag used to control infinite loop between check and get
+        """
         file_path = os.path.join(self._root_dir, 'src', 'data',
                                  'MONTEL_TOKEN.txt')
         if not os.path.exists(file_path):
@@ -39,20 +44,21 @@ class MontelDataGetter(BaseDataGetter):
                         'https://coop.eikon.tum.de/mbt/mbt.json').text)[
                     'access_token']
             except json.decoder.JSONDecodeError as e:
-                raise ConnectionRefusedError(
-                    'Please connect to the MWN via a VPN network! See '
-                    'https://www.lrz.de/services/netz/mobil/vpn_en/ '
-                    'for help.') from e
+                if len(os.environ['MONTEL_TOKEN']) > 5:
+                    token = os.environ['MONTEL_TOKEN']
+                else:
+                    raise BearerTokenMissingError from e
             with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(token)
         with open(file_path, 'r', encoding='utf-8') as file:
             self.token = file.readline()
-        self._token_check()
+        self._token_check(force)
 
-    def _token_check(self) -> None:
+    def _token_check(self, force: bool = False) -> None:
         """
         This function checks whether the token is still valid
-        :raise PermissionError: if Bearer Token invalid
+        :raise BearerTokenMissingError: if Bearer Token invalid
+        :param force: Enforce toking working this time else throw error
         """
         response = requests.get(
             'https://api.montelnews.com/spot/getmetadata',
@@ -64,7 +70,10 @@ class MontelDataGetter(BaseDataGetter):
             token_path = os.path.join(self._root_dir, 'src', 'data',
                                       'MONTEL_TOKEN.txt')
             os.remove(token_path)
-            self.get_token()
+            if not force:
+                self.get_token(force=True)
+            else:
+                raise BearerTokenMissingError
 
     def _show_available_datasets(self) -> None:
         """
@@ -203,6 +212,15 @@ class MontelDataGetter(BaseDataGetter):
                                'No data available for montel API.')
         assert self.check_data(data)
         return data
+
+
+class BearerTokenMissingError(Exception):
+    def __init__(self):
+        super().__init__("The Bearer Token for the Montel API could not be found "
+                         "or is invalid. "
+                         "Please store the token in the MONTEL_TOKEN environment "
+                         "variable or connect to the MWN to retrieve the token "
+                         "automatically.")
 
 
 if __name__ == '__main__':

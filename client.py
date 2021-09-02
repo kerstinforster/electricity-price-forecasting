@@ -9,27 +9,36 @@ import pytz
 ########## Change only this
 
 # Group secret
-secret = "42"
+secret = "g03o38k"
 # Group port, change the last two digits to your group number
 port = 39003
 # Path to your python file containing the prediction
 # sys.path.append("/ai/predict")
+
+def get_date_and_time():
+    from datetime import datetime
+    date = datetime.now().strftime('%Y-%m-%d')
+    hour = datetime.now().strftime('T%H')
+    return date, hour
 
 # Module(s) to perform prediction
 from src.final_predictor import FinalPredictor
 
 # Functions that are used to get your predictions
 def predict_hour():
-    fp = FinalPredictor()
-    return fp.predict_hour(None)
+    date, hour = get_date_and_time()
+    fp = FinalPredictor(date, hour)
+    return fp.predict_hour()
 
 def predict_day():
-    fp = FinalPredictor()
-    return fp.predict_day(None)
+    date, hour = get_date_and_time()
+    fp = FinalPredictor(date, hour)
+    return fp.predict_day()
 
 def predict_week():
-    fp = FinalPredictor()
-    return fp.predict_week(None)
+    date, hour = get_date_and_time()
+    fp = FinalPredictor(date, hour)
+    return fp.predict_week()
 
 ##########
 
