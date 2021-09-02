@@ -52,9 +52,11 @@ docker tag gitlab.ldv.ei.tum.de:5005/ami2021/group03 currence-container
 
 Finally, run the container using:
 ```console
-bash docker/docker_run.sh
+docker run -p 8888:8888 -p 39003:39003 --name currence-container currence-container
 ```
 You can add an optional `-d` flag to the docker run command to run the docker container in the background.
+Also, you can add `--gpus all` argument to pass the GPUs into the container.
+
 In order to update the token in the running container, use the following command in a new terminal:
 ```console
 docker exec currence-container python3 docker/set_token.py TOKEN
