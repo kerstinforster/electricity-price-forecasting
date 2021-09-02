@@ -1,8 +1,6 @@
-<div style="text-align: right; margin-top: 10px; margin-bottom: -30px;"> 
-<img height="50px" class="center-block" src="https://www.tum.de/typo3conf/ext/in2template/Resources/Public/Images/tum-logo.svg">
-</div>
+![Currence Logo](src/frontend/resources/currence_logo_big.png)
 
-# Group 3 Applied Machine Intelligence
+# Currence Project
 
 This is the project repository of group 3 for the course Applied Machine Intelligence at TUM.  
 Group Members:
@@ -29,13 +27,40 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Execution
+## Frontend
 Run the frontend / web application:
 Go to the root repository 'group03' in your terminal and then type:
 ```console
 streamlit run web_app.py
 ```
 
+## Docker
+The docker container of this repository already has all dependencies installed and runs
+out of the box.   
+You can either build the container yourself or download the prebuilt container.  
+To build the container, run:
+```console
+docker build -t currence-container -f docker/Dockerfile --build-arg token=TOKEN .
+```
+Hereby, the `TOKEN` build argument is optional and should be replaced with the current Montel API Bearer Token.  
+
+To download the prebuild container, run:
+```console
+docker pull gitlab.ldv.ei.tum.de:5005/ami2021/group03
+docker tag gitlab.ldv.ei.tum.de:5005/ami2021/group03 currence-container
+```
+
+Finally, run the container using:
+```console
+docker run -p 8888:8888 -p 39003:39003 --name currence-container currence-container
+```
+You can add an optional `-d` flag to the docker run command to run the docker container in the background.
+Also, you can add `--gpus all` argument to pass the GPUs into the container.
+
+In order to update the token in the running container, use the following command in a new terminal:
+```console
+docker exec currence-container python3 docker/set_token.py TOKEN
+```
 ## Linter
 Run the linter:
 ```console

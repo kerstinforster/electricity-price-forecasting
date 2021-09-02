@@ -1,5 +1,8 @@
 """ This class implements a data getter that downloads the entso-e data"""
 
+import os
+import requests
+import warnings
 import pandas as pd
 # import time
 import numpy as np
@@ -177,28 +180,38 @@ class EntsoeDataGetter(BaseDataGetter):
         load_temp = {}
 
         if start1 is not None and end1 is not None:
-            load1 = self.client.query_load(self.country_code1, start=start1,
-                                           end=end1)
-            if isinstance(load1, pd.Series):
-                load1 = load1.to_frame('Load')
-            load1 = load1.rename_axis('time').resample('1H').sum()/4
-            load1.set_axis(['load1'], axis='columns', inplace=True)
-            load1.reset_index(level=0, inplace=True)
-            if start2 is not None and end2 is not None:
-                load1 = load1.append(pd.DataFrame(
-                    {'time': [pd.Timestamp('201810010000', tz='Europe/Berlin')],
-                     'load1': [load1.load1.iloc[-1]]}))
-            load_temp = load1
+            try:
+                load1 = self.client.query_load(self.country_code1, start=start1,
+                                               end=end1)
+                if isinstance(load1, pd.Series):
+                    load1 = load1.to_frame('Load')
+                load1 = load1.rename_axis('time').resample('1H').sum()/4
+                load1.set_axis(['load1'], axis='columns', inplace=True)
+                load1.reset_index(level=0, inplace=True)
+                if start2 is not None and end2 is not None:
+                    load1 = load1.append(pd.DataFrame(
+                        {'time': [pd.Timestamp('201810010000',
+                                               tz='Europe/Berlin')],
+                         'load1': [load1.load1.iloc[-1]]}))
+                load_temp = load1
+            except requests.exceptions.HTTPError:
+                # Entsoe API is down again
+                return None
 
         if start2 is not None and end2 is not None:
-            load2 = self.client.query_load(self.country_code2, start=start2,
-                                           end=end2)
-            if isinstance(load2, pd.Series):
-                load2 = load2.to_frame('Load')
-            load2 = load2.rename_axis('time').resample('1H').sum()/4
-            load2.set_axis(['load2'], axis='columns', inplace=True)
-            load2.reset_index(level=0, inplace=True)
-            load_temp = load2
+            try:
+                load2 = self.client.query_load(self.country_code2, start=start2,
+                                               end=end2)
+
+                if isinstance(load2, pd.Series):
+                    load2 = load2.to_frame('Load')
+                load2 = load2.rename_axis('time').resample('1H').sum()/4
+                load2.set_axis(['load2'], axis='columns', inplace=True)
+                load2.reset_index(level=0, inplace=True)
+                load_temp = load2
+            except requests.exceptions.HTTPError:
+                # Entsoe API is down again
+                return None
 
         if start1 is not None and end1 is not None and start2 is not None and \
                 end2 is not None:
@@ -235,6 +248,8 @@ class EntsoeDataGetter(BaseDataGetter):
             self.end_time = datetime.now().strftime('T%H')
 
         raw_data = self._get_load_data(self.start_date, self.end_date)
+        if raw_data is None:
+            return self.api_down_data()
         for key, value in self.field_name_map.items():
             data_temp = self._get_generation_data(key,
                                                   value,
@@ -339,6 +354,21 @@ class EntsoeDataGetter(BaseDataGetter):
         assert self.check_data(df)
         return df
 
+    def api_down_data(self):
+        """
+        Emergency mode that is used when no connection to entsoe is available.
+        Copies the values from the previous days over.
+        :return: Dataframe with copied over data
+        """
+        warnings.warn('No connection to the Entso-e API is possible. '
+                      'Using emergency mode!')
+        all_data = pd.read_csv(os.path.join(self.data_dir, 'data.csv'))
+        all_data['Time'] = pd.to_datetime(all_data['Time'])
+        start = pd.to_datetime(self.start_date + 'T00') - pd.Timedelta(days=1)
+        start_index = all_data.index[all_data['Time'] == start]
+        data = all_data.iloc[start_index[0]:, :]
+        data = data.reset_index(drop=True)
+        return self.repair_data(data).iloc[24:, :]
 
 if __name__ == '__main__':
     eg = EntsoeDataGetter()
