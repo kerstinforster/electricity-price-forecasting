@@ -41,9 +41,10 @@ class MontelDataGetter(BaseDataGetter):
             try:
                 token = json.loads(
                     requests.get(
-                        'https://coop.eikon.tum.de/mbt/mbt.json').text)[
+                        'https://coop.eikon.tum.de/mbt/mbt.json',
+                        timeout=10).text)[
                     'access_token']
-            except json.decoder.JSONDecodeError as e:
+            except Exception as e:  # pylint: disable=broad-except
                 if len(os.environ['MONTEL_TOKEN']) > 5:
                     token = os.environ['MONTEL_TOKEN']
                 else:
@@ -216,11 +217,10 @@ class MontelDataGetter(BaseDataGetter):
 
 class BearerTokenMissingError(Exception):
     def __init__(self):
-        super().__init__("The Bearer Token for the Montel API could not be found "
-                         "or is invalid. "
-                         "Please store the token in the MONTEL_TOKEN environment "
-                         "variable or connect to the MWN to retrieve the token "
-                         "automatically.")
+        super().__init__('The Bearer Token for the Montel API could not be '
+                         'found or is invalid. Please store the token in '
+                         'the MONTEL_TOKEN environment variable or connect '
+                         'to the MWN to retrieve the token automatically.')
 
 
 if __name__ == '__main__':

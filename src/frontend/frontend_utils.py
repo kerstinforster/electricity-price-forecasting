@@ -6,8 +6,6 @@ wants to display them.
 from datetime import datetime
 import pandas as pd
 
-from src.final_predictor import FinalPredictor
-
 
 def get_current_time() -> (str, str):
     """
@@ -21,7 +19,6 @@ def get_current_time() -> (str, str):
 
 
 def get_date_and_time() -> (str, str):
-    from datetime import datetime
     date = datetime.now().strftime('%Y-%m-%d')
     hour = datetime.now().strftime('T%H')
     return date, hour

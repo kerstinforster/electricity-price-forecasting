@@ -28,17 +28,17 @@ from src.final_predictor import FinalPredictor
 def predict_hour():
     date, hour = get_date_and_time()
     fp = FinalPredictor(date, hour)
-    return fp.predict_hour()
+    return float(fp.predict_hour())
 
 def predict_day():
     date, hour = get_date_and_time()
     fp = FinalPredictor(date, hour)
-    return fp.predict_day()
+    return float(fp.predict_day())
 
 def predict_week():
     date, hour = get_date_and_time()
     fp = FinalPredictor(date, hour)
-    return fp.predict_week()
+    return float(fp.predict_week())
 
 ##########
 

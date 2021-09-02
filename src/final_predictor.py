@@ -1,4 +1,5 @@
-""" Final predictor used to perform the three predictions with the final models """
+""" Final predictor used to perform the three predictions with the
+final models """
 
 from tensorflow.keras.preprocessing import timeseries_dataset_from_array
 
@@ -8,6 +9,9 @@ from src.data.dataset_generator import DatasetGenerator
 
 
 class FinalPredictor:
+    """
+    Final Predictor class that performs the final predictions
+    """
     def __init__(self, date: str, time: str):
         """
         Initialize a final predictor that predicts the three time horizons

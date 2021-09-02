@@ -2,6 +2,7 @@
 
 import os
 import requests
+import warnings
 import pandas as pd
 # import time
 import numpy as np
@@ -189,7 +190,8 @@ class EntsoeDataGetter(BaseDataGetter):
                 load1.reset_index(level=0, inplace=True)
                 if start2 is not None and end2 is not None:
                     load1 = load1.append(pd.DataFrame(
-                        {'time': [pd.Timestamp('201810010000', tz='Europe/Berlin')],
+                        {'time': [pd.Timestamp('201810010000',
+                                               tz='Europe/Berlin')],
                          'load1': [load1.load1.iloc[-1]]}))
                 load_temp = load1
             except requests.exceptions.HTTPError:
@@ -354,11 +356,10 @@ class EntsoeDataGetter(BaseDataGetter):
 
     def api_down_data(self):
         """
-        Emergency mode that is used when no connection to the entsoe api is available.
+        Emergency mode that is used when no connection to entsoe is available.
         Copies the values from the previous days over.
         :return: Dataframe with copied over data
         """
-        import warnings
         warnings.warn('No connection to the Entso-e API is possible. '
                       'Using emergency mode!')
         all_data = pd.read_csv(os.path.join(self.data_dir, 'data.csv'))

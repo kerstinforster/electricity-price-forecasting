@@ -40,13 +40,14 @@ out of the box.
 You can either build the container yourself or download the prebuilt container.  
 To build the container, run:
 ```console
-docker build -t currence-container -f docker/Dockerfile --build-arg token=TOKEN.
+docker build -t currence-container -f docker/Dockerfile --build-arg token=TOKEN .
 ```
 Hereby, the `TOKEN` build argument is optional and should be replaced with the current Montel API Bearer Token.  
 
 To download the prebuild container, run:
 ```console
-docker pull something
+docker pull gitlab.ldv.ei.tum.de:5005/ami2021/group03
+docker tag gitlab.ldv.ei.tum.de:5005/ami2021/group03 currence-container
 ```
 
 Finally, run the container using:
@@ -54,7 +55,10 @@ Finally, run the container using:
 bash docker/docker_run.sh
 ```
 You can add an optional `-d` flag to the docker run command to run the docker container in the background.
-
+In order to update the token in the running container, use the following command in a new terminal:
+```console
+docker exec currence-container python3 docker/set_token.py TOKEN
+```
 ## Linter
 Run the linter:
 ```console

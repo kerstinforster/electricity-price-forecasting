@@ -10,6 +10,7 @@ from src.data.dataset_generator import DatasetGenerator
 from src.frontend.frontend_utils import *
 from src.frontend.frontend_graphs import GraphGenerator
 from src.frontend.frontend_elements import *
+from src.final_predictor import FinalPredictor
 
 
 @st.cache
@@ -37,9 +38,6 @@ def request_prediction(
         df: pd.DataFrame,
         required_prediction: str) -> pd.DataFrame:
     """
-    Currently still a mock-up function! This function can also not be moved into
-    'src', because it will have to use 'LivePredictionPipeline'.
-
     Requests a prediction from 'LivePredictionPipeline' for a specified time
     (1 hour, day or week).
 
