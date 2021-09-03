@@ -40,22 +40,34 @@ out of the box.
 You can either build the container yourself or download the prebuilt container.  
 To build the container, run:
 ```console
-docker build -t currence-container -f docker/Dockerfile --build-arg token=TOKEN .
+docker build -t currence-container -f docker/Dockerfile .
 ```
-Hereby, the `TOKEN` build argument is optional and should be replaced with the current Montel API Bearer Token.  
+Alternatively, build the GPU container:
+```console
+docker build -t currence-container:gpu -f docker/Dockerfile.gpu --build-arg token=TOKEN .
+```
+Optionally, the `--build-arg token=TOKEN` build argument can be used to store the current Montel API Bearer Token in the container.  
 
 To download the prebuild container, run:
 ```console
 docker pull gitlab.ldv.ei.tum.de:5005/ami2021/group03
 docker tag gitlab.ldv.ei.tum.de:5005/ami2021/group03 currence-container
 ```
+or GPU:
+```console
+docker pull gitlab.ldv.ei.tum.de:5005/ami2021/group03:gpu
+docker tag gitlab.ldv.ei.tum.de:5005/ami2021/group03:gpu currence-container:gpu
+```
 
 Finally, run the container using:
 ```console
 docker run -p 8888:8888 -p 39003:39003 --name currence-container currence-container
 ```
+or for GPU:
+```console
+docker run -p 8888:8888 -p 39003:39003 --gpus all --name currence-container currence-container:gpu
+```
 You can add an optional `-d` flag to the docker run command to run the docker container in the background.
-Also, you can add `--gpus all` argument to pass the GPUs into the container.
 
 In order to update the token in the running container, use the following command in a new terminal:
 ```console

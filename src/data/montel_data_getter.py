@@ -45,9 +45,9 @@ class MontelDataGetter(BaseDataGetter):
                         timeout=10).text)[
                     'access_token']
             except Exception as e:  # pylint: disable=broad-except
-                if len(os.environ['MONTEL_TOKEN']) > 5:
+                try:
                     token = os.environ['MONTEL_TOKEN']
-                else:
+                except KeyError as e:
                     raise BearerTokenMissingError from e
             with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(token)

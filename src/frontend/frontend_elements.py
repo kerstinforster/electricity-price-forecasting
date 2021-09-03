@@ -21,24 +21,24 @@ def create_comparison_table(past_string, past, prediction) -> None:
     :param prediction: Dataframe with the prediction
     """
     st.subheader("Comparison")
-    cols = st.beta_columns(4)
+    cols = st.columns(4)
     cols[1].write(past_string)  # column label
     cols[2].write("Current")  # column label
     cols[3].write("Predicted")  # column label
 
-    cols = st.beta_columns(4)
+    cols = st.columns(4)
     cols[0].write("Price")  # row label
     cols[1].write(f'{past["SPOTPrice"].iloc[0]}')
     cols[2].write(f'{past["SPOTPrice"].iloc[-1]}')
     cols[3].write(f'{prediction["SPOTPrice"]}')
 
-    cols = st.beta_columns(4)
+    cols = st.columns(4)
     cols[0].write("Time")  # row label
     cols[1].write(f'{past["Time"].iloc[0].time()}')
     cols[2].write(f'{past["Time"].iloc[-1].time()}')
     cols[3].write(f'{prediction["Time"].time()}')
 
-    cols = st.beta_columns(4)
+    cols = st.columns(4)
     cols[0].write("Date")  # row label
     cols[1].write(f'{past["Time"].iloc[0].date()}')
     cols[2].write(f'{past["Time"].iloc[-1].date()}')
