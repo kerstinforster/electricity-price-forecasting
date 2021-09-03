@@ -6,7 +6,7 @@ pandas
 sklearn
 coverage
 entsoe-py
-streamlit
+streamlit==0.88.0
 plotly
 meteostat
 geopy

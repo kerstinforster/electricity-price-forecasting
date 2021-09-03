@@ -43,10 +43,11 @@ def predict_week():
 ##########
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-host = socket.gethostbyname(socket.gethostname() + '.local') 
-
-s.bind((host,port))
+try:
+    host = socket.gethostbyname(socket.gethostname() + '.local')
+except socket.gaierror:
+    host = socket.gethostbyname(socket.gethostname())
+s.bind((host, port))
 s.listen(5)
 
 while True:

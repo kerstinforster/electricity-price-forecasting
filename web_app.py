@@ -23,8 +23,9 @@ def request_montel_data() -> pd.DataFrame:
     :return: Dataframe with columns 'Time' and 'SPOTPrice'
     """
     dg = DatasetGenerator(['montel'])
-    return dg.get_dataset(start_date='2016-01-01', end_date='latest',
-                          end_time='T23')
+    date, time = get_date_and_time()
+    dataset = dg.get_dataset('2021-08-01', date, time)
+    return dataset
 
 
 def get_date_and_time():
