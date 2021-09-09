@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: group03-deployment
+  labels:
+    app: group03
+spec:
+  selector:
+    matchLabels:
+      app: group03
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: group03
+    spec:
+      containers:
+      - name: group03-docker
+        image: "gitlab.ldv.ei.tum.de:5005/ami2021/kubernetes-demo/spot:latest"
+        ports:
+        - containerPort: 8888
+        - containerPort: 39002
+      imagePullSecrets:
+        - name: k8s-g03-reg
+
