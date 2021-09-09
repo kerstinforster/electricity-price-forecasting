@@ -1,8 +1,7 @@
-FROM ubuntu:20.04
+FROM python:3.8-slim-buster
 
 ARG token
 
-RUN apt-get update && apt-get install -y python3.8 python3-pip python3.8-venv git
 RUN echo "Europe/Berlin" > /etc/timezone
 RUN DEBIAN_FRONTEND="noninteractive" TZ="Europe/Berlin" apt-get -y install tzdata
 COPY requirements.txt requirements.txt
