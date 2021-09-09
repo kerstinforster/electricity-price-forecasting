@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: group03-docker
-        image: "gitlab.ldv.ei.tum.de:5005/ami2021/kubernetes-demo/spot:latest"
+        image: "gitlab.ldv.ei.tum.de:5005/ami2021/group03/group03docker:latest"
         ports:
         - containerPort: 8888
         - containerPort: 39002
