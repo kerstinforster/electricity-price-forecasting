@@ -1,48 +1,21 @@
 stages:
-  - test
-  - lint
+  - build
 
-.only-default: &only-default
-  only:
-    - merge_requests
-    - tags
-    - branches
-    - pushes
-    - web
+group03:
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  stage: build
 
-  # docker image
-image: ubuntu:20.04
-
-variables:
-  GIT_SUBMODULE_STRATEGY: recursive
-
-# run tests using the binary built before
-test:
-  stage: test
-  <<: *only-default
   before_script:
-    - apt update && DEBIAN_FRONTEND=noninteractive apt-get install -yq python3.8 python3-venv git
-    - git submodule update --init --recursive
-    - python3.8 -m venv venv
-  script:
-    - source venv/bin/activate
-    - pip install wheel
-    - pip install -r requirements.txt
-    - python -m pytest --cov --cov-report xml
-    - coverage xml
-  artifacts:
-    reports:
-      cobertura: coverage.xml
+    - echo $CI_PROJECT_DIR
 
-lint:
-  stage: lint
-  only:
-    - merge_requests
-  before_script:
-    - apt update && DEBIAN_FRONTEND=noninteractive apt-get install -yq python3.8 python3-venv git
-    - git submodule update --init --recursive
-    - python3.8 -m venv venv
   script:
-    - source venv/bin/activate
-    - pip install wheel pylint
-    - pylint src test
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR/docker --dockerfile ./Dockerfile --destination $CI_REGISTRY_IMAGE/group03docker:$CI_COMMIT_TAG
+
+  only:
+    - master-k8s-benchmark
+  tags:
+    - daedalus
