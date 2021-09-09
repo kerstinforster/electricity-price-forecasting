@@ -13,7 +13,7 @@ group03:
   script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR/docker --dockerfile ./Dockerfile --destination $CI_REGISTRY_IMAGE/group03docker:$CI_COMMIT_TAG
+    - /kaniko/executor --context $CI_PROJECT_DIR/ --dockerfile ./docker/Dockerfile --destination $CI_REGISTRY_IMAGE/group03docker:$CI_COMMIT_TAG
 
   only:
     - master-k8s-benchmark
