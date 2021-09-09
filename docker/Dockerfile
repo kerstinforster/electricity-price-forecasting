@@ -15,4 +15,4 @@ ENV STREAMLIT_SERVER_PORT=8888
 ENV CLIENT_PORT=39003
 ENV MONTEL_TOKEN=$token
 
-ENTRYPOINT ["bash", "docker/entrypoint.sh"]
+ENTRYPOINT ["bash", "entrypoint.sh"]
