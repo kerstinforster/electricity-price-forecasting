@@ -5,7 +5,7 @@ ARG token
 RUN echo "Europe/Berlin" > /etc/timezone
 RUN DEBIAN_FRONTEND="noninteractive" TZ="Europe/Berlin" apt-get -y install tzdata
 COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt --no-cache-dir
 
 COPY . /currence
 WORKDIR /currence
