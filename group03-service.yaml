@@ -7,6 +7,11 @@ spec:
   selector:
     app: group03
   ports:
-    - protocol: TCP
+    - name: "webapp"
+      protocol: TCP
       port: 8888
       nodePort: 31003
+    - name: "client"
+      protocol: TCP
+      port: 39003
+      nodePort: 31903
