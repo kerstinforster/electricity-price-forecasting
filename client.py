@@ -54,7 +54,7 @@ while True:
     conn, addr = s.accept()	# accept the connection
     conn.close()
     ts = str(datetime.now(pytz.timezone("Europe/Berlin")))[:-13]
-    if addr[0] == "129.187.240.34":
+    if addr[0]:
         message = {"secret": secret, "time": ts, "hour": round(predict_hour(),4), "day": round(predict_day(),4), "week": round(predict_week(),4)}
         data = json.dumps(message)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
