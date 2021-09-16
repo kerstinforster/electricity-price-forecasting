@@ -43,11 +43,8 @@ def predict_week():
 ##########
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-try:
-    host = socket.gethostbyname(socket.gethostname() + '.local')
-except socket.gaierror:
-    host = socket.gethostbyname(socket.gethostname())
-s.bind((host, port))
+
+s.bind(("0.0.0.0", port))
 s.listen(5)
 
 while True:
@@ -60,7 +57,7 @@ while True:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             print("Connecting to server.")
-            sock.connect(("129.187.240.34", 39000))
+            sock.connect(("10.195.13.6", 39000))
             print("Sending data.")
             sock.sendall(bytes(data,encoding="utf-8"))
             print("Sent: {}".format(data))
