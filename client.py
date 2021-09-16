@@ -57,7 +57,7 @@ while True:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             print("Connecting to server.")
-            sock.connect(("10.195.13.6", 39000))
+            sock.connect(("10.195.6.13", 39000))
             print("Sending data.")
             sock.sendall(bytes(data,encoding="utf-8"))
             print("Sent: {}".format(data))
